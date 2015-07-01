@@ -31,7 +31,7 @@
 using namespace std;
 
 void MyAnalysis::BuildEvent() {
-   
+
    Muons.clear();
    for (int i = 0; i < NMuon; ++i) {
       MyMuon muon(Muon_Px[i], Muon_Py[i], Muon_Pz[i], Muon_E[i]);
@@ -39,7 +39,7 @@ void MyAnalysis::BuildEvent() {
       muon.SetCharge(Muon_Charge[i]);
       Muons.push_back(muon);
    }
-   
+
    Electrons.clear();
    for (int i = 0; i < NElectron; ++i) {
       MyElectron electron(Electron_Px[i], Electron_Py[i], Electron_Pz[i], Electron_E[i]);
@@ -47,14 +47,14 @@ void MyAnalysis::BuildEvent() {
       electron.SetCharge(Electron_Charge[i]);
       Electrons.push_back(electron);
    }
-   
+
    Photons.clear();
    for (int i = 0; i < NPhoton; ++i) {
       MyPhoton photon(Photon_Px[i], Photon_Py[i], Photon_Pz[i], Photon_E[i]);
       photon.SetIsolation(Photon_Iso[i]);
       Photons.push_back(photon);
    }
-   
+
    Jets.clear();
    for (int i = 0; i < NJet; ++i) {
       MyJet jet(Jet_Px[i], Jet_Py[i], Jet_Pz[i], Jet_E[i]);
@@ -62,7 +62,7 @@ void MyAnalysis::BuildEvent() {
       jet.SetJetID(Jet_ID[i]);
       Jets.push_back(jet);
    }
-   
+
    hadB.SetXYZM(MChadronicBottom_px, MChadronicBottom_py, MChadronicBottom_pz, 4.8);
    lepB.SetXYZM(MCleptonicBottom_px, MCleptonicBottom_py, MCleptonicBottom_pz, 4.8);
    hadWq.SetXYZM(MChadronicWDecayQuark_px, MChadronicWDecayQuark_py, MChadronicWDecayQuark_pz, 0.0);
@@ -70,39 +70,39 @@ void MyAnalysis::BuildEvent() {
    lepWl.SetXYZM(MClepton_px, MClepton_py, MClepton_pz, 0.0);
    lepWn.SetXYZM(MCneutrino_px, MCneutrino_py, MCneutrino_pz, 0.0);
    met.SetXYZM(MET_px, MET_py, 0., 0.);
-   
+
    EventWeight *= weight_factor;
-   
+
 }
 
 void MyAnalysis::Begin(TTree * /*tree*/) {
    // The Begin() function is called at the start of the query.
    // When running with PROOF Begin() is only called on the client.
    // The tree argument is deprecated (on PROOF 0 is passed).
-   
+
    TString option = GetOption();
-   
+
 }
 
 void MyAnalysis::SlaveBegin(TTree * /*tree*/) {
    // The SlaveBegin() function is called after the Begin() function.
    // When running with PROOF SlaveBegin() is called on each slave server.
    // The tree argument is deprecated (on PROOF 0 is passed).
-   
+
    TString option = GetOption();
-   
+
    h_Mmumu = new TH1F("Mmumu", "Invariant di-muon mass", 60, 60, 120);
    h_Mmumu->SetXTitle("m_{#mu#mu}");
    h_Mmumu->Sumw2();
    histograms.push_back(h_Mmumu);
    histograms_MC.push_back(h_Mmumu);
-   
+
    h_NMuon = new TH1F("NMuon", "Number of muons", 7, 0, 7);
    h_NMuon->SetXTitle("No. Muons");
    h_NMuon->Sumw2();
    histograms.push_back(h_NMuon);
    histograms_MC.push_back(h_NMuon);
-   
+
 }
 
 Bool_t MyAnalysis::Process(Long64_t entry) {
@@ -123,19 +123,19 @@ Bool_t MyAnalysis::Process(Long64_t entry) {
    // Use fStatus to set the return value of TTree::Process().
    //
    // The return value is currently not used.
-   
+
    ++TotalEvents;
-   
+
    GetEntry(entry);
-   
+
    if (TotalEvents % 10000 == 0)
       cout << "Next event -----> " << TotalEvents << endl;
-   
+
    BuildEvent();
-   
+
    double MuonPtCut = 25.;
    double MuonRelIsoCut = 0.10;
-   
+
    //   cout << "Jets: " << endl;
    //   for (vector<MyJet>::iterator it = Jets.begin(); it != Jets.end(); ++it) {
    //      cout << "pt, eta, phi, btag, id: " << it->Pt() << ", " << it->Eta() << ", " << it->Phi() << ", " << it->IsBTagged() << ", " << it->GetJetID()
@@ -156,14 +156,14 @@ Bool_t MyAnalysis::Process(Long64_t entry) {
    //      cout << "pt, eta, phi, iso: " << it->Pt() << ", " << it->Eta() << ", " << it->Phi() << ", " << it->GetIsolation()
    //      << endl;
    //   }
-   
-   
+
+
    //////////////////////////////
    // Exercise 1: Invariant Di-Muon mass
-   
+
    int N_IsoMuon = 0;
    MyMuon *muon1, *muon2;
-   
+
    for (vector<MyMuon>::iterator jt = Muons.begin(); jt != Muons.end(); ++jt) {
       if (jt->IsIsolated(MuonRelIsoCut)) {
          ++N_IsoMuon;
@@ -171,16 +171,16 @@ Bool_t MyAnalysis::Process(Long64_t entry) {
          if (N_IsoMuon == 2) muon2 = &(*jt);
       }
    }
-   
+
    h_NMuon->Fill(N_IsoMuon, EventWeight);
-   
+
    if (N_IsoMuon > 1 && triggerIsoMu24) {
       if (muon1->Pt()>MuonPtCut) {
          h_Mmumu->Fill((*muon1 + *muon2).M(), EventWeight);
       }
    }
    //////////////////////////////
-   
+
    return kTRUE;
 }
 
@@ -188,12 +188,12 @@ void MyAnalysis::SlaveTerminate() {
    // The SlaveTerminate() function is called after all entries or objects
    // have been processed. When running with PROOF SlaveTerminate() is called
    // on each slave server.
-   
+
 }
 
 void MyAnalysis::Terminate() {
    // The Terminate() function is the last function to be called during
    // a query. It always runs on the client, it can be used to present
    // the results graphically or save the results to file.
-   
+
 }
