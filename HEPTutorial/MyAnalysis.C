@@ -26,6 +26,7 @@
 #include "MyAnalysis.h"
 #include <iostream>
 #include <TH1F.h>
+#include <TH3F.h>
 #include <TLatex.h>
 
 using namespace std;
@@ -91,6 +92,7 @@ void MyAnalysis::SlaveBegin(TTree * /*tree*/) {
 
    TString option = GetOption();
 
+   // task 1
    h_Mmumu = new TH1F("Mmumu", "Invariant di-muon mass", 60, 60, 120);
    h_Mmumu->SetXTitle("m_{#mu#mu}");
    h_Mmumu->Sumw2();
@@ -102,6 +104,86 @@ void MyAnalysis::SlaveBegin(TTree * /*tree*/) {
    h_NMuon->Sumw2();
    histograms.push_back(h_NMuon);
    histograms_MC.push_back(h_NMuon);
+
+   // task 2
+   h_NJets = new TH1F("NJets", "Number of jets", 12, 0, 12);
+   h_NJets->SetXTitle("Number of jets");
+   h_NJets->Sumw2();
+   histograms.push_back(h_NJets);
+   histograms_MC.push_back(h_NJets);
+
+   h_NBtaggedJets = new TH1F("NBtaggedJets", "Number of btagged jets", 12, 0, 12);
+   h_NBtaggedJets->SetXTitle("Number of btagged jets");
+   h_NBtaggedJets->Sumw2();
+   histograms.push_back(h_NBtaggedJets);
+   histograms_MC.push_back(h_NBtaggedJets);
+
+   h_MJets = new TH1F("NJets", "Invariant mass of jets", 50, 0, 100);
+   h_MJets->SetXTitle("Invariant mass of jets");
+   h_MJets->Sumw2();
+   histograms.push_back(h_MJets);
+   histograms_MC.push_back(h_MJets);
+
+   h_PerpJets = new TH1F("PerpJets", "Tranverse component for jets", 50, 0, 100);
+   h_PerpJets->SetXTitle("Tranverse component for jets");
+   h_PerpJets->Sumw2();
+   histograms.push_back(h_PerpJets);
+   histograms_MC.push_back(h_PerpJets);
+
+   h_MET = new TH1F("MET", "sqrt(MET_px*MET_px + MET_py*MET_py)", 50, 0, 100);
+   h_MET->SetXTitle("sqrt(MET_px*MET_px + MET_py*MET_py)");
+   h_MET->Sumw2();
+   histograms.push_back(h_MET);
+   histograms_MC.push_back(h_MET);
+
+   h_IsolationElectrons = new TH1F("Electrons isolation", "Electrons isolation", 50, 0, 100);
+   h_IsolationElectrons->SetXTitle("Electrons isolation");
+   h_IsolationElectrons->Sumw2();
+   histograms.push_back(h_IsolationElectrons);
+   histograms_MC.push_back(h_IsolationElectrons);
+
+   h_NElectrons = new TH1F("Electrons count", "Electrons count", 10, 0, 10);
+   h_NElectrons->SetXTitle("Electrons count");
+   h_NElectrons->Sumw2();
+   histograms.push_back(h_NElectrons);
+   histograms_MC.push_back(h_NElectrons);
+
+   muonsAngularDistributionEtaGraph = new TH1F("Angular distribution of myons (eta)", "Angular distribution of myons (eta)", 100, -10, 10);
+   muonsAngularDistributionEtaGraph->SetXTitle("Angular distribution of myons (eta)");
+   muonsAngularDistributionEtaGraph->Sumw2();
+   histograms.push_back(muonsAngularDistributionEtaGraph);
+   histograms_MC.push_back(muonsAngularDistributionEtaGraph);
+
+   muonsAngularDistributionPhiGraph = new TH1F("Angular distribution of myons (phi)", "Angular distribution of myons (phi)", 100, -10, 10);
+   muonsAngularDistributionPhiGraph->SetXTitle("Angular distribution of myons (phi)");
+   muonsAngularDistributionPhiGraph->Sumw2();
+   histograms.push_back(muonsAngularDistributionPhiGraph);
+   histograms_MC.push_back(muonsAngularDistributionPhiGraph);
+
+   muonsAngularDistributionPtGraph = new TH1F("Angular distribution of myons (pt)", "Angular distribution of myons (pt)", 100, -100, 100);
+   muonsAngularDistributionPtGraph->SetXTitle("Angular distribution of myons (pt)");
+   muonsAngularDistributionPtGraph->Sumw2();
+   histograms.push_back(muonsAngularDistributionPtGraph);
+   histograms_MC.push_back(muonsAngularDistributionPtGraph);
+
+   jetsAngularDistributionEtaGraph = new TH1F("Angular distribution of jets (eta)", "Angular distribution of jets (eta)", 100, -10, 10);
+   jetsAngularDistributionEtaGraph->SetXTitle("Angular distribution of jets (eta)");
+   jetsAngularDistributionEtaGraph->Sumw2();
+   histograms.push_back(jetsAngularDistributionEtaGraph);
+   histograms_MC.push_back(jetsAngularDistributionEtaGraph);
+
+   jetsAngularDistributionPhiGraph = new TH1F("Angular distribution of jets (phi)", "Angular distribution of jets (phi)", 100, -10, 10);
+   jetsAngularDistributionPhiGraph->SetXTitle("Angular distribution of jets (phi)");
+   jetsAngularDistributionPhiGraph->Sumw2();
+   histograms.push_back(jetsAngularDistributionPhiGraph);
+   histograms_MC.push_back(jetsAngularDistributionPhiGraph);
+
+   jetsAngularDistributionPtGraph = new TH1F("Angular distribution of jets (pt)", "Angular distribution of jets (pt)", 100, -100, 100);
+   jetsAngularDistributionPtGraph->SetXTitle("Angular distribution of jets (pt)");
+   jetsAngularDistributionPtGraph->Sumw2();
+   histograms.push_back(jetsAngularDistributionPtGraph);
+   histograms_MC.push_back(jetsAngularDistributionPtGraph);
+
 
 }
 
@@ -180,6 +262,45 @@ Bool_t MyAnalysis::Process(Long64_t entry) {
       }
    }
    //////////////////////////////
+
+   // Exercise 2
+   if (N_IsoMuon == 0) {
+      return kTRUE;
+   }
+
+   for (vector<MyMuon>::iterator it = Muons.begin(); it != Muons.end(); ++it) {
+      muonsAngularDistributionEtaGraph->Fill(it->Eta(), EventWeight);
+      muonsAngularDistributionPhiGraph->Fill(it->Phi(), EventWeight);
+      muonsAngularDistributionPtGraph->Fill(it->Pt(), EventWeight);
+   }
+
+   int N_Jets = 0;
+   int N_BtaggedJets = 0;
+   for (vector<MyJet>::iterator it = Jets.begin(); it != Jets.end(); ++it) {
+      ++N_Jets;
+      h_MJets->Fill(it->M(), EventWeight);
+      h_PerpJets->Fill(it->Perp(), EventWeight);
+
+      if (it->IsBTagged()) {
+         ++N_BtaggedJets;
+      }
+
+      jetsAngularDistributionEtaGraph->Fill(it->Eta(), EventWeight);
+      jetsAngularDistributionPhiGraph->Fill(it->Phi(), EventWeight);
+      jetsAngularDistributionPtGraph->Fill(it->Pt(), EventWeight);
+   }
+   h_NJets->Fill(N_Jets, EventWeight);
+   h_MET->Fill(sqrt(MET_px*MET_px + MET_py*MET_py), EventWeight);
+   h_NBtaggedJets->Fill(N_BtaggedJets);
+
+   int N_Electrons = 0;
+   for (vector<MyElectron>::iterator it = Electrons.begin(); it != Electrons.end(); ++it) {
+      ++N_Electrons;
+      h_IsolationElectrons->Fill(it->GetIsolation(), EventWeight);
+   }
+   h_NElectrons->Fill(N_Electrons, EventWeight);
+
+
 
    return kTRUE;
 }

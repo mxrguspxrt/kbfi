@@ -6,29 +6,30 @@
 #include <string>
 
 int main() {
-   
+
    float lumi = 50.;
-   
+
+   // https://root.cern.ch/root/html/TChain.html
    MyAnalysis *A = new MyAnalysis();
    TChain* ch = new TChain("events");
    ch->Add("files/data.root");
    ch->Process(A);
-   
+
    MyAnalysis *B = new MyAnalysis();
    TChain* ch2 = new TChain("events");
    ch2->Add("files/ttbar.root");
    ch2->Process(B);
-   
+
    MyAnalysis *C = new MyAnalysis();
    TChain* ch3 = new TChain("events");
    ch3->Add("files/wjets.root");
    ch3->Process(C);
-   
+
    MyAnalysis *D = new MyAnalysis();
    TChain* ch4 = new TChain("events");
    ch4->Add("files/dy.root");
    ch4->Process(D);
-   
+
    MyAnalysis *E = new MyAnalysis();
    TChain* ch5 = new TChain("events");
    ch5->Add("files/ww.root");
@@ -48,7 +49,7 @@ int main() {
    TChain* ch8 = new TChain("events");
    ch8->Add("files/qcd.root");
    ch8->Process(H);
-   
+
    MyAnalysis *I = new MyAnalysis();
    TChain* ch9 = new TChain("events");
    ch9->Add("files/single_top.root");
@@ -64,9 +65,9 @@ int main() {
 	P.AddBg(G->histograms, std::string("ZZ"));
 	P.AddBg(H->histograms, std::string("QCD"));
 	P.AddBg(I->histograms, std::string("single Top"));
-   
+
 	P.Plot(string("results.pdf"));
-   
+
 	Plotter P_MC;
 	P_MC.AddBg(B->histograms_MC, std::string("TTbar"));
 	P_MC.AddBg(C->histograms_MC, std::string("Wjets"));

@@ -13,6 +13,7 @@
 #include <TChain.h>
 #include <TSelector.h>
 #include <TH1F.h>
+#include <TH3F.h>
 #include <TLorentzVector.h>
 #include <vector>
 
@@ -30,7 +31,7 @@ using namespace std;
 class MyAnalysis: public TSelector {
 public:
    TTree *fChain; //!pointer to the analyzed TTree or TChain
-   
+
    // Declaration of leaf types
    Int_t NJet;
    Float_t Jet_Px[10]; //[NJet]
@@ -83,7 +84,7 @@ public:
    Int_t NPrimaryVertices;
    Bool_t triggerIsoMu24;
    Float_t EventWeight;
-   
+
    // List of branches
    TBranch *b_NJet; //!
    TBranch *b_Jet_Px; //!
@@ -136,7 +137,7 @@ public:
    TBranch *b_NPrimaryVertices; //!
    TBranch *b_triggerIsoMu24; //!
    TBranch *b_EventWeight; //!
-   
+
    MyAnalysis(float sf = 1., float wf = 1, TTree * /*tree*/= 0) :
    fChain(0) {
       weight_factor = wf;
@@ -169,27 +170,45 @@ public:
    }
    virtual void SlaveTerminate();
    virtual void Terminate();
-   
+
    void BuildEvent();
-   
+
    int TotalEvents;
    vector<MyJet> Jets;
    vector<MyMuon> Muons;
    vector<MyElectron> Electrons;
    vector<MyPhoton> Photons;
-   
+
    TLorentzVector hadB, lepB, hadWq, hadWqb, lepWl, lepWn;
    TLorentzVector met;
-   
+
    float weight_factor;
    float SF_b;
-   
+
    TH1F *h_Mmumu;
    TH1F *h_NMuon;
-   
+
+   TH1F *h_NJets;
+   TH1F *h_NBtaggedJets;
+   TH1F *h_MJets;
+   TH1F *h_PerpJets;
+
+   TH1F *h_MET;
+
+   TH1F *h_IsolationElectrons;
+   TH1F *h_NElectrons;
+
+   TH1F *muonsAngularDistributionEtaGraph;
+   TH1F *muonsAngularDistributionPhiGraph;
+   TH1F *muonsAngularDistributionPtGraph;
+
+   TH1F *jetsAngularDistributionEtaGraph;
+   TH1F *jetsAngularDistributionPhiGraph;
+   TH1F *jetsAngularDistributionPtGraph;
+
    vector<TH1F*> histograms;
    vector<TH1F*> histograms_MC;
-   
+
 };
 
 #endif
@@ -204,12 +223,12 @@ void MyAnalysis::Init(TTree *tree)
    // code, but the routine can be extended by the user if needed.
    // Init() will be called many times when running on PROOF
    // (once per file to be processed).
-   
+
    // Set branch addresses and branch pointers
    if (!tree) return;
    fChain = tree;
    fChain->SetMakeClass(1);
-   
+
    fChain->SetBranchAddress("NJet", &NJet, &b_NJet);
    fChain->SetBranchAddress("Jet_Px", Jet_Px, &b_Jet_Px);
    fChain->SetBranchAddress("Jet_Py", Jet_Py, &b_Jet_Py);
@@ -261,7 +280,7 @@ void MyAnalysis::Init(TTree *tree)
    fChain->SetBranchAddress("NPrimaryVertices", &NPrimaryVertices, &b_NPrimaryVertices);
    fChain->SetBranchAddress("triggerIsoMu24", &triggerIsoMu24, &b_triggerIsoMu24);
    fChain->SetBranchAddress("EventWeight", &EventWeight, &b_EventWeight);
-   
+
    TotalEvents = 0;
 }
 
@@ -272,7 +291,7 @@ Bool_t MyAnalysis::Notify()
    // is started when using PROOF. It is normally not necessary to make changes
    // to the generated code, but the routine can be extended by the
    // user if needed. The return value is currently not used.
-   
+
    return kTRUE;
 }
 

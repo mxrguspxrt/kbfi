@@ -9,7 +9,7 @@
 
 Plotter::Plotter() {
 	// TODO Auto-generated constructor stub
-   
+
 }
 
 Plotter::~Plotter() {
@@ -17,10 +17,10 @@ Plotter::~Plotter() {
 }
 
 void Plotter::Plot(std::string filename) {
-   
+
 	gROOT->Reset();
 	//gROOT->SetStyle("Plain");
-   
+
 	TStyle *MyStyle = new TStyle("MyStyle","My Root Styles");
 	MyStyle->SetStatColor(0);
 	MyStyle->SetCanvasColor(0);
@@ -62,13 +62,13 @@ void Plotter::Plot(std::string filename) {
 	MyStyle->SetTitleSize(0.05, "y");
 	MyStyle->SetTitleSize(0.05, "z");
 	gROOT->SetStyle("MyStyle");
-   
+
 	//gROOT->ForceStyle();
-   
-	bool DrawLog = true;
-   
+
+	bool DrawLog = false;
+
 	for (int i = 0; i < N_histos; ++i) {
-      
+
 		THStack *hs;
 		TLegend *l;
       int Nset = data.size() + bg.size() + signal.size();
@@ -125,7 +125,7 @@ void Plotter::Plot(std::string filename) {
       std::string plotname;
 		if (data.size() > 0) {
          plotname = std::string(data.at(0).at(i)->GetName());
-			data.at(0).at(i)->SetMaximum(5 * data.at(0).at(i)->GetMaximum());
+			data.at(0).at(i)->SetMaximum(1.5 * data.at(0).at(i)->GetMaximum());
 			data.at(0).at(i)->GetXaxis()->SetTitleOffset(1.3);
 			data.at(0).at(i)->GetYaxis()->SetTitleOffset(1.3);
 			data.at(0).at(i)->GetYaxis()->SetTitle("Events");
@@ -147,7 +147,7 @@ void Plotter::Plot(std::string filename) {
          if (bg.size() > 0)
             hs->GetXaxis()->SetTitle(bg.at(0).at(i)->GetXaxis()->GetTitle());
          hs->GetYaxis()->SetTitle("Events");
-         
+
          l->Draw("same");
 		}
 //      c->Print((filename+std::string("_")+plotname+std::string(".pdf")).c_str());
@@ -157,7 +157,7 @@ void Plotter::Plot(std::string filename) {
 			c->Print((filename+std::string(")")).c_str());
 		else
 			c->Print(filename.c_str());
-      
+
 	}
-   
+
 }
