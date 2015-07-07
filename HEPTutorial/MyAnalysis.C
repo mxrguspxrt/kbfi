@@ -148,37 +148,37 @@ void MyAnalysis::SlaveBegin(TTree * /*tree*/) {
    histograms.push_back(h_NElectrons);
    histograms_MC.push_back(h_NElectrons);
 
-   muonsAngularDistributionEtaGraph = new TH1F("Angular distribution of myons (eta)", "Angular distribution of myons (eta)", 100, -10, 10);
+   muonsAngularDistributionEtaGraph = new TH1F("Angular distribution of myons (eta)", "Angular distribution of myons (eta)", 100, -4, 4);
    muonsAngularDistributionEtaGraph->SetXTitle("Angular distribution of myons (eta)");
    muonsAngularDistributionEtaGraph->Sumw2();
    histograms.push_back(muonsAngularDistributionEtaGraph);
    histograms_MC.push_back(muonsAngularDistributionEtaGraph);
 
-   muonsAngularDistributionPhiGraph = new TH1F("Angular distribution of myons (phi)", "Angular distribution of myons (phi)", 100, -10, 10);
+   muonsAngularDistributionPhiGraph = new TH1F("Angular distribution of myons (phi)", "Angular distribution of myons (phi)", 100, -4, 4);
    muonsAngularDistributionPhiGraph->SetXTitle("Angular distribution of myons (phi)");
    muonsAngularDistributionPhiGraph->Sumw2();
    histograms.push_back(muonsAngularDistributionPhiGraph);
    histograms_MC.push_back(muonsAngularDistributionPhiGraph);
 
-   muonsAngularDistributionPtGraph = new TH1F("Angular distribution of myons (pt)", "Angular distribution of myons (pt)", 100, -100, 100);
+   muonsAngularDistributionPtGraph = new TH1F("Angular distribution of myons (pt)", "Angular distribution of myons (pt)", 100, 0, 100);
    muonsAngularDistributionPtGraph->SetXTitle("Angular distribution of myons (pt)");
    muonsAngularDistributionPtGraph->Sumw2();
    histograms.push_back(muonsAngularDistributionPtGraph);
    histograms_MC.push_back(muonsAngularDistributionPtGraph);
 
-   jetsAngularDistributionEtaGraph = new TH1F("Angular distribution of jets (eta)", "Angular distribution of jets (eta)", 100, -10, 10);
+   jetsAngularDistributionEtaGraph = new TH1F("Angular distribution of jets (eta)", "Angular distribution of jets (eta)", 100, -4, 4);
    jetsAngularDistributionEtaGraph->SetXTitle("Angular distribution of jets (eta)");
    jetsAngularDistributionEtaGraph->Sumw2();
    histograms.push_back(jetsAngularDistributionEtaGraph);
    histograms_MC.push_back(jetsAngularDistributionEtaGraph);
 
-   jetsAngularDistributionPhiGraph = new TH1F("Angular distribution of jets (phi)", "Angular distribution of jets (phi)", 100, -10, 10);
+   jetsAngularDistributionPhiGraph = new TH1F("Angular distribution of jets (phi)", "Angular distribution of jets (phi)", 100, -4, 4);
    jetsAngularDistributionPhiGraph->SetXTitle("Angular distribution of jets (phi)");
    jetsAngularDistributionPhiGraph->Sumw2();
    histograms.push_back(jetsAngularDistributionPhiGraph);
    histograms_MC.push_back(jetsAngularDistributionPhiGraph);
 
-   jetsAngularDistributionPtGraph = new TH1F("Angular distribution of jets (pt)", "Angular distribution of jets (pt)", 100, -100, 100);
+   jetsAngularDistributionPtGraph = new TH1F("Angular distribution of jets (pt)", "Angular distribution of jets (pt)", 100, 0, 100);
    jetsAngularDistributionPtGraph->SetXTitle("Angular distribution of jets (pt)");
    jetsAngularDistributionPtGraph->Sumw2();
    histograms.push_back(jetsAngularDistributionPtGraph);
@@ -243,10 +243,12 @@ Bool_t MyAnalysis::Process(Long64_t entry) {
    //////////////////////////////
    // Exercise 1: Invariant Di-Muon mass
 
+   int N_Muon = 0;
    int N_IsoMuon = 0;
    MyMuon *muon1, *muon2;
 
    for (vector<MyMuon>::iterator jt = Muons.begin(); jt != Muons.end(); ++jt) {
+      ++N_Muon;
       if (jt->IsIsolated(MuonRelIsoCut)) {
          ++N_IsoMuon;
          if (N_IsoMuon == 1) muon1 = &(*jt);
@@ -264,7 +266,7 @@ Bool_t MyAnalysis::Process(Long64_t entry) {
    //////////////////////////////
 
    // Exercise 2
-   if (N_IsoMuon == 0) {
+   if (N_Muon > 0) {
       return kTRUE;
    }
 
