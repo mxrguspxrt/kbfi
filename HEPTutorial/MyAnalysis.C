@@ -266,41 +266,43 @@ Bool_t MyAnalysis::Process(Long64_t entry) {
    //////////////////////////////
 
    // Exercise 2
-   if (N_Muon > 0) {
-      return kTRUE;
-   }
-
-   for (vector<MyMuon>::iterator it = Muons.begin(); it != Muons.end(); ++it) {
-      muonsAngularDistributionEtaGraph->Fill(it->Eta(), EventWeight);
-      muonsAngularDistributionPhiGraph->Fill(it->Phi(), EventWeight);
-      muonsAngularDistributionPtGraph->Fill(it->Pt(), EventWeight);
-   }
-
-   int N_Jets = 0;
-   int N_BtaggedJets = 0;
-   for (vector<MyJet>::iterator it = Jets.begin(); it != Jets.end(); ++it) {
-      ++N_Jets;
-      h_MJets->Fill(it->M(), EventWeight);
-      h_PerpJets->Fill(it->Perp(), EventWeight);
-
-      if (it->IsBTagged()) {
-         ++N_BtaggedJets;
+   if (N_Muon == 0) {
+      for (vector<MyMuon>::iterator it = Muons.begin(); it != Muons.end(); ++it) {
+         muonsAngularDistributionEtaGraph->Fill(it->Eta(), EventWeight);
+         muonsAngularDistributionPhiGraph->Fill(it->Phi(), EventWeight);
+         muonsAngularDistributionPtGraph->Fill(it->Pt(), EventWeight);
       }
 
-      jetsAngularDistributionEtaGraph->Fill(it->Eta(), EventWeight);
-      jetsAngularDistributionPhiGraph->Fill(it->Phi(), EventWeight);
-      jetsAngularDistributionPtGraph->Fill(it->Pt(), EventWeight);
-   }
-   h_NJets->Fill(N_Jets, EventWeight);
-   h_MET->Fill(sqrt(MET_px*MET_px + MET_py*MET_py), EventWeight);
-   h_NBtaggedJets->Fill(N_BtaggedJets);
+      int N_Jets = 0;
+      // https://en.wikipedia.org/wiki/B-tagging
+      int N_BtaggedJets = 0;
+      for (vector<MyJet>::iterator it = Jets.begin(); it != Jets.end(); ++it) {
+         ++N_Jets;
+         h_MJets->Fill(it->M(), EventWeight);
+         h_PerpJets->Fill(it->Perp(), EventWeight);
 
-   int N_Electrons = 0;
-   for (vector<MyElectron>::iterator it = Electrons.begin(); it != Electrons.end(); ++it) {
-      ++N_Electrons;
-      h_IsolationElectrons->Fill(it->GetIsolation(), EventWeight);
+         if (it->IsBTagged()) {
+            ++N_BtaggedJets;
+         }
+
+         jetsAngularDistributionEtaGraph->Fill(it->Eta(), EventWeight);
+         jetsAngularDistributionPhiGraph->Fill(it->Phi(), EventWeight);
+         jetsAngularDistributionPtGraph->Fill(it->Pt(), EventWeight);
+      }
+      h_NJets->Fill(N_Jets, EventWeight);
+      h_MET->Fill(sqrt(MET_px*MET_px + MET_py*MET_py), EventWeight);
+      h_NBtaggedJets->Fill(N_BtaggedJets);
+
+      int N_Electrons = 0;
+      for (vector<MyElectron>::iterator it = Electrons.begin(); it != Electrons.end(); ++it) {
+         ++N_Electrons;
+         h_IsolationElectrons->Fill(it->GetIsolation(), EventWeight);
+      }
+      h_NElectrons->Fill(N_Electrons, EventWeight);
    }
-   h_NElectrons->Fill(N_Electrons, EventWeight);
+
+
+
 
 
 
