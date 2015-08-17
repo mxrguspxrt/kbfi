@@ -12,7 +12,8 @@ LFLAGS =
 RCXX=$(CFLAGS) $(ROOTCFLAGS)
 RLXX=$(LFLAGS) $(ROOTLIBS)
 
-SRC1= MyAnalysis.o MyJet.o MyMuon.o MyElectron.o MyPhoton.o Plotter.o
+#SRC1= MyAnalysis.o MyJet.o MyMuon.o MyElectron.o MyPhoton.o Plotter.o
+SRC1= MyAnalysis.o MyJet.o MyMuon.o MyElectron.o MyPhoton.o Plotter.o Ex3.o Ex3Analysis.o
 
 %.o: %.C %.h
 		$(C) $(RCXX) -c $<
@@ -28,5 +29,5 @@ example: $(SRC1) example.o
 
 clean:
 		@rm -f *~
-		@rm -f *.o 
+		@rm -f *.o
 		@rm -f *.x

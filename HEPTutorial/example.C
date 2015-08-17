@@ -4,6 +4,7 @@
 #include <TChain.h>
 #include <TGraphAsymmErrors.h>
 #include <string>
+#include "Ex3.h"
 
 int main() {
 
@@ -78,5 +79,7 @@ int main() {
 	P_MC.AddBg(H->histograms_MC, std::string("QCD"));
 	P_MC.AddBg(I->histograms_MC, std::string("single Top"));
    P_MC.Plot(string("results_MC.pdf"));
+   Ex3* ex3 = new Ex3();
+   ex3->GenerateGraph();
 
 }

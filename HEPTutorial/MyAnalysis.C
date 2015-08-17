@@ -184,6 +184,7 @@ void MyAnalysis::SlaveBegin(TTree * /*tree*/) {
    histograms.push_back(jetsAngularDistributionPtGraph);
    histograms_MC.push_back(jetsAngularDistributionPtGraph);
 
+   // MyAnalysis::DrawExercise3();
 
 }
 
@@ -267,6 +268,8 @@ Bool_t MyAnalysis::Process(Long64_t entry) {
 
    // Exercise 2
    if (N_Muon == 0) {
+
+      // we have no myons, so it does not make sence, but let it be here
       for (vector<MyMuon>::iterator it = Muons.begin(); it != Muons.end(); ++it) {
          muonsAngularDistributionEtaGraph->Fill(it->Eta(), EventWeight);
          muonsAngularDistributionPhiGraph->Fill(it->Phi(), EventWeight);
@@ -301,10 +304,7 @@ Bool_t MyAnalysis::Process(Long64_t entry) {
       h_NElectrons->Fill(N_Electrons, EventWeight);
    }
 
-
-
-
-
+   // MyAnalysis::ProcessExercise3();
 
    return kTRUE;
 }
