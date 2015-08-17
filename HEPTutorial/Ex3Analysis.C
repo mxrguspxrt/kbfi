@@ -86,7 +86,7 @@ void Ex3Analysis::SlaveBegin(TTree * /*tree*/) {
 
    efficiency_histogram = new TH2F("Efficiency histogram", "Efficiency histogram", 250, 0.0, 1.0, 250, 0.0, 200.0);
    efficiency_histogram->SetXTitle("Efficiency");
-
+   efficiency_histogram->SetYTitle("GeV limit");
 }
 
 
