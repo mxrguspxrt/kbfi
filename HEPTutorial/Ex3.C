@@ -16,10 +16,6 @@ void Ex3::GenerateGraph() {
   events->Add("files/ttbar.root");
   events->Process(a);
 
-  Plotter P;
-  P.AddBg(a->histograms, "TTbar");
-  P.Plot("ex3.pdf");
-
   cout << "Ex3 end.\n";
 
 }

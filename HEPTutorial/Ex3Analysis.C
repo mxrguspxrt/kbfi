@@ -1,3 +1,7 @@
+// per event muon with highest pt -> to histogram
+// if passed HLT -> to second histogram
+// second histogram / first histogram -> third histogram
+
 #define Ex3Analysis_cxx
 
 #include <string>
@@ -75,18 +79,11 @@ void Ex3Analysis::SlaveBegin(TTree * /*tree*/) {
 
    pt_histogram = new TH1F("Myon tranverse momentum", "Myon tranverse momentum", 60, 0, 200);
    pt_histogram->SetXTitle("pT");
+   pt_histogram->Sumw2();
 
-   histograms.push_back(pt_histogram);
-   histograms_MC.push_back(pt_histogram);
-
-   // in C++ they are not 0 by default
-   for(int i = 0; i < 250; i++) {
-      counts_for_events[i] = 0;
-   }
-
-   efficiency_histogram = new TH2F("Efficiency histogram", "Efficiency histogram", 250, 0.0, 1.0, 250, 0.0, 200.0);
-   efficiency_histogram->SetXTitle("Efficiency");
-   efficiency_histogram->SetYTitle("GeV limit");
+   pt_passed_hlt_histogram = new TH1F("Passed HLT", "Passed HLT", 60, 0, 200);
+   pt_passed_hlt_histogram->SetXTitle("pT");
+   pt_passed_hlt_histogram->Sumw2();
 }
 
 
@@ -118,35 +115,30 @@ Bool_t Ex3Analysis::Process(Long64_t entry) {
 
    BuildEvent();
 
+   double muon_highest_perp = get_muon_highest_perp();
+   bool event_passed_hlt = triggerIsoMu24;
 
-   // just put muon pt into histogram
-   for (vector<MyMuon>::iterator muon = Muons.begin(); muon != Muons.end(); ++muon) {
-      if (muon->IsIsolated()) {
-         pt_histogram->Fill(muon->Perp(), EventWeight);
-      }
-   }
+   if (muon_highest_perp > 0) {
+      pt_histogram->Fill(muon_highest_perp, EventWeight);
 
-   // calc effiencies
-   for (int gev = 0; gev < 100; gev++) {
-      if (has_muon_with_pt_creater_than(gev)) {
-         count_event_for(gev);
+      if (event_passed_hlt) {
+         pt_passed_hlt_histogram->Fill(muon_highest_perp, EventWeight);
       }
    }
 
    return kTRUE;
 }
 
-bool Ex3Analysis::has_muon_with_pt_creater_than(double gev) {
+
+double Ex3Analysis::get_muon_highest_perp() {
+   double muon_highest_perp = 0;
+
    for (vector<MyMuon>::iterator muon = Muons.begin(); muon != Muons.end(); ++muon) {
-      if (muon->IsIsolated() && muon->Perp() > gev) {
-         return true;
+      if (muon->IsIsolated() && muon->Perp() > muon_highest_perp) {
+         muon_highest_perp = muon->Perp();
       }
    }
-   return false;
-}
-
-void Ex3Analysis::count_event_for(int gev) {
-   counts_for_events[gev] = counts_for_events[gev] ? counts_for_events[gev] + 1 : 1;
+   return muon_highest_perp;
 }
 
 
@@ -157,21 +149,18 @@ void Ex3Analysis::count_event_for(int gev) {
 void Ex3Analysis::SlaveTerminate() {
    cout << "Ex3Analysis::SlaveTerminate()\n";
 
-   TCanvas* canvas = new TCanvas("canvas");
+   TCanvas *canvas = new TCanvas("canvas");
 
-   for(int i = 0; i < 250; i++) {
-      double efficiency = 1 - (double)counts_for_events[i] / (double)TotalEvents;
-      cout
-         << "TotalEvents: " << TotalEvents
-         << " and events over " << i << " GeV: " << counts_for_events[i]
-         << " that means that efficiency is: " << efficiency
-         << "\n";
+   pt_histogram->Draw();
+   canvas->Print("ex3-pt_histogram.pdf");
 
-      efficiency_histogram->Fill(efficiency, i);
-   }
-   efficiency_histogram->Draw();
+   pt_passed_hlt_histogram->Draw();
+   canvas->Print("ex3-pt_passed_hlt_histogram.pdf");
 
-   canvas->Print("ex3-efficiency.pdf");
+   TH1F *effiency = pt_passed_hlt_histogram;
+   effiency->Divide(pt_histogram);
+   effiency->Draw();
+   canvas->Print("ex3-effiency.pdf");
 
 }
 

@@ -16,6 +16,7 @@
 #include <TH2F.h>
 #include <TLorentzVector.h>
 #include <vector>
+#include <TCanvas.h>
 
 #include "MyJet.h"
 #include "MyMuon.h"
@@ -173,8 +174,7 @@ public:
 
    void BuildEvent();
 
-   bool has_muon_with_pt_creater_than(double gev);
-   void count_event_for(int gev);
+   double get_muon_highest_perp();
 
    int TotalEvents;
    vector<MyJet> Jets;
@@ -202,7 +202,8 @@ public:
    TH1F *h_NElectrons;
 
    TH1F *pt_histogram;
-   TH2F *efficiency_histogram;
+   TH1F *pt_passed_hlt_histogram;
+   TH1F *efficiency_histogram;
    unsigned int counts_for_events[250];
 
    vector<TH1F*> histograms;
