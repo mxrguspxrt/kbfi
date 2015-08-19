@@ -2,6 +2,8 @@
 // if passed HLT -> to second histogram
 // second histogram / first histogram -> third histogram
 
+//
+
 #define Ex3Analysis_cxx
 
 #include <string>
@@ -77,11 +79,15 @@ void Ex3Analysis::Begin(TTree * /*tree*/) {
 void Ex3Analysis::SlaveBegin(TTree * /*tree*/) {
    TString option = GetOption();
 
-   pt_histogram = new TH1F("Myon tranverse momentum", "Myon tranverse momentum", 60, 0, 200);
+   pt_histogram = new TH1F("Muon pt", "Muon pt", 60, 0, 200);
    pt_histogram->SetXTitle("pT");
    pt_histogram->Sumw2();
 
    pt_passed_hlt_histogram = new TH1F("Passed HLT", "Passed HLT", 60, 0, 200);
+   pt_passed_hlt_histogram->SetXTitle("pT");
+   pt_passed_hlt_histogram->Sumw2();
+
+   efficiency_histogram = new TH1F("Efficiency", "Efficiency", 60, 0, 200);
    pt_passed_hlt_histogram->SetXTitle("pT");
    pt_passed_hlt_histogram->Sumw2();
 }
@@ -115,14 +121,15 @@ Bool_t Ex3Analysis::Process(Long64_t entry) {
 
    BuildEvent();
 
-   double muon_highest_perp = get_muon_highest_perp();
+   double muon_highest_pt = get_muon_highest_pt();
    bool event_passed_hlt = triggerIsoMu24;
 
-   if (muon_highest_perp > 0) {
-      pt_histogram->Fill(muon_highest_perp, EventWeight);
+   if (muon_highest_pt > 0) {
+      pt_histogram->Fill(muon_highest_pt, EventWeight);
 
       if (event_passed_hlt) {
-         pt_passed_hlt_histogram->Fill(muon_highest_perp, EventWeight);
+         pt_passed_hlt_histogram->Fill(muon_highest_pt, EventWeight);
+         efficiency_histogram->Fill(muon_highest_pt, EventWeight);
       }
    }
 
@@ -130,15 +137,15 @@ Bool_t Ex3Analysis::Process(Long64_t entry) {
 }
 
 
-double Ex3Analysis::get_muon_highest_perp() {
-   double muon_highest_perp = 0;
+double Ex3Analysis::get_muon_highest_pt() {
+   double muon_highest_pt = 0;
 
    for (vector<MyMuon>::iterator muon = Muons.begin(); muon != Muons.end(); ++muon) {
-      if (muon->IsIsolated() && muon->Perp() > muon_highest_perp) {
-         muon_highest_perp = muon->Perp();
+      if (muon->IsIsolated() && muon->Pt() > muon_highest_pt) {
+         muon_highest_pt = muon->Pt();
       }
    }
-   return muon_highest_perp;
+   return muon_highest_pt;
 }
 
 
@@ -151,16 +158,15 @@ void Ex3Analysis::SlaveTerminate() {
 
    TCanvas *canvas = new TCanvas("canvas");
 
-   pt_histogram->Draw();
+   pt_histogram->Draw("E1");
    canvas->Print("ex3-pt_histogram.pdf");
 
-   pt_passed_hlt_histogram->Draw();
+   pt_passed_hlt_histogram->Draw("E1");
    canvas->Print("ex3-pt_passed_hlt_histogram.pdf");
 
-   TH1F *effiency = pt_passed_hlt_histogram;
-   effiency->Divide(pt_histogram);
-   effiency->Draw();
-   canvas->Print("ex3-effiency.pdf");
+   efficiency_histogram->Divide(pt_histogram);
+   efficiency_histogram->Draw("E1");
+   canvas->Print("ex3-efficiency_histogram.pdf");
 
 }
 

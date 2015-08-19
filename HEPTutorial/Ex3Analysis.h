@@ -174,7 +174,7 @@ public:
 
    void BuildEvent();
 
-   double get_muon_highest_perp();
+   double get_muon_highest_pt();
 
    int TotalEvents;
    vector<MyJet> Jets;
