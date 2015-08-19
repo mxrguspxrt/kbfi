@@ -2,7 +2,8 @@
 // if passed HLT -> to second histogram
 // second histogram / first histogram -> third histogram
 
-//
+// pt - transverse momentum
+// eta - angle 2.1-2.5, eta, theta
 
 #define Ex3Analysis_cxx
 
@@ -158,10 +159,10 @@ void Ex3Analysis::SlaveTerminate() {
 
    TCanvas *canvas = new TCanvas("canvas");
 
-   pt_histogram->Draw("E1");
+   pt_histogram->Draw();
    canvas->Print("ex3-pt_histogram.pdf");
 
-   pt_passed_hlt_histogram->Draw("E1");
+   pt_passed_hlt_histogram->Draw();
    canvas->Print("ex3-pt_passed_hlt_histogram.pdf");
 
    efficiency_histogram->Divide(pt_histogram);
