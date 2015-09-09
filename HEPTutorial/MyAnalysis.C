@@ -304,13 +304,23 @@ Bool_t MyAnalysis::Process(Long64_t entry) {
       h_NBtaggedJets->Fill(N_BtaggedJets);
 
       int N_Electrons = 0;
+      float highest_pt = 0;
       for (vector<MyElectron>::iterator it = Electrons.begin(); it != Electrons.end(); ++it) {
          ++N_Electrons;
          h_IsolationElectrons->Fill(it->GetIsolation(), EventWeight);
       }
       h_NElectrons->Fill(N_Electrons, EventWeight);
 
-      if (this->analysisType == "TTbar") {
+
+      float highest_pt_for_isolated_muon = 0;
+
+      for (vector<MyMuon>::iterator it = Muons.begin(); it != Muons.end(); ++it) {
+         if (it->IsIsolated() && highest_pt_for_isolated_muon < it->Pt()) {
+            highest_pt_for_isolated_muon = it->Pt();
+         }
+      }
+
+      if (this->analysisType == "TTbar" && highest_pt_for_isolated_muon > 25) {
          SelectedTTBarEvents++;
       }
    }
@@ -332,7 +342,7 @@ void MyAnalysis::SlaveTerminate() {
 
    if (this->analysisType=="TTbar") {
       float efficiency = (float) SelectedTTBarEvents / (float) TTBarEvents;
-      cout << "Efficiency: " << SelectedTTBarEvents << " / " << TTBarEvents << " = " << efficiency << endl;
+      cout << "3.2 Efficiency: " << SelectedTTBarEvents << " / " << TTBarEvents << " = " << efficiency << endl;
    }
 }
 
