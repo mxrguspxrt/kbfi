@@ -138,8 +138,11 @@ Bool_t Ex3Analysis::Process(Long64_t entry) {
       }
    }
 
-   if (muon_highest_pt > 25.0) {
-      MuonOver25PtEvents++;
+   if (muon_highest_pt > 25) {
+      ++MuonOver25PtEvents;
+      if (event_passed_hlt) {
+         ++MuonOver25PtEventsPassedHlt;
+      }
    }
 
    return kTRUE;
@@ -178,8 +181,11 @@ void Ex3Analysis::SlaveTerminate() {
    canvas->Print("ex3-efficiency_histogram.pdf");
 
 
-   float efficiency = 1.0 - ((float)MuonOver25PtEvents / (float)TotalEvents);
-   cout << "Efficiency for over pT > 25Gev: 1.0 - (" << MuonOver25PtEvents << " / " << TotalEvents << ") =" << efficiency << "\n";
+   cout << "MuonOver25PtEventsPassedHlt: " << MuonOver25PtEventsPassedHlt << "\n";
+   cout << "MuonOver25PtEvents: " << MuonOver25PtEvents << "\n";
+
+   float efficiency = ((float)MuonOver25PtEventsPassedHlt / (float)MuonOver25PtEvents);
+   cout << "Efficiency for over pT > 25Gev: (" << MuonOver25PtEventsPassedHlt << " / " << MuonOver25PtEvents << ") =" << efficiency << "\n";
 
 }
 

@@ -33,6 +33,8 @@ class Ex3Analysis: public TSelector {
 public:
    TTree *fChain; //!pointer to the analyzed TTree or TChain
 
+   int MuonOver25PtEventsPassedHlt;
+
    // Declaration of leaf types
    Int_t NJet;
    Float_t Jet_Px[10]; //[NJet]
@@ -178,6 +180,7 @@ public:
 
    int TotalEvents;
    int MuonOver25PtEvents;
+
    vector<MyJet> Jets;
    vector<MyMuon> Muons;
    vector<MyElectron> Electrons;
@@ -284,6 +287,7 @@ void Ex3Analysis::Init(TTree *tree)
 
    TotalEvents = 0;
    MuonOver25PtEvents = 0;
+   MuonOver25PtEventsPassedHlt = 0;
 }
 
 Bool_t Ex3Analysis::Notify()
