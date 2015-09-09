@@ -171,9 +171,14 @@ public:
    virtual void SlaveTerminate();
    virtual void Terminate();
 
+   void SetAnalysisType(string analysisType);
+   string analysisType;
+
    void BuildEvent();
 
    int TotalEvents;
+   int TTBarEvents;
+   int SelectedTTBarEvents;
    vector<MyJet> Jets;
    vector<MyMuon> Muons;
    vector<MyElectron> Electrons;
@@ -282,6 +287,8 @@ void MyAnalysis::Init(TTree *tree)
    fChain->SetBranchAddress("EventWeight", &EventWeight, &b_EventWeight);
 
    TotalEvents = 0;
+   TTBarEvents = 0;
+   SelectedTTBarEvents = 0;
 }
 
 Bool_t MyAnalysis::Notify()

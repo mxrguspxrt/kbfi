@@ -177,6 +177,7 @@ public:
    double get_muon_highest_pt();
 
    int TotalEvents;
+   int MuonOver25PtEvents;
    vector<MyJet> Jets;
    vector<MyMuon> Muons;
    vector<MyElectron> Electrons;
@@ -282,6 +283,7 @@ void Ex3Analysis::Init(TTree *tree)
    fChain->SetBranchAddress("EventWeight", &EventWeight, &b_EventWeight);
 
    TotalEvents = 0;
+   MuonOver25PtEvents = 0;
 }
 
 Bool_t Ex3Analysis::Notify()

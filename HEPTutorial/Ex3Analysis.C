@@ -80,17 +80,21 @@ void Ex3Analysis::Begin(TTree * /*tree*/) {
 void Ex3Analysis::SlaveBegin(TTree * /*tree*/) {
    TString option = GetOption();
 
-   pt_histogram = new TH1F("Muon pt", "Muon pt", 60, 0, 200);
+   int pins_count = 100;
+   int xup = 0;
+   int xlow = 200;
+
+   pt_histogram = new TH1F("Muon pt", "Muon pt", pins_count, xup, xlow);
    pt_histogram->SetXTitle("pT");
    pt_histogram->Sumw2();
 
-   pt_passed_hlt_histogram = new TH1F("Passed HLT", "Passed HLT", 60, 0, 200);
+   pt_passed_hlt_histogram = new TH1F("Passed HLT", "Passed HLT", pins_count, xup, xlow);
    pt_passed_hlt_histogram->SetXTitle("pT");
    pt_passed_hlt_histogram->Sumw2();
 
-   efficiency_histogram = new TH1F("Efficiency", "Efficiency", 60, 0, 200);
-   pt_passed_hlt_histogram->SetXTitle("pT");
-   pt_passed_hlt_histogram->Sumw2();
+   efficiency_histogram = new TH1F("Efficiency", "Efficiency", pins_count, xup, xlow);
+   efficiency_histogram->SetXTitle("pT");
+   efficiency_histogram->Sumw2();
 }
 
 
@@ -134,6 +138,10 @@ Bool_t Ex3Analysis::Process(Long64_t entry) {
       }
    }
 
+   if (muon_highest_pt > 25.0) {
+      MuonOver25PtEvents++;
+   }
+
    return kTRUE;
 }
 
@@ -168,6 +176,10 @@ void Ex3Analysis::SlaveTerminate() {
    efficiency_histogram->Divide(pt_histogram);
    efficiency_histogram->Draw("E1");
    canvas->Print("ex3-efficiency_histogram.pdf");
+
+
+   float efficiency = 1.0 - ((float)MuonOver25PtEvents / (float)TotalEvents);
+   cout << "Efficiency for over pT > 25Gev: 1.0 - (" << MuonOver25PtEvents << " / " << TotalEvents << ") =" << efficiency << "\n";
 
 }
 

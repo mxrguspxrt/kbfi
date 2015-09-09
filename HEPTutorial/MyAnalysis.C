@@ -266,10 +266,17 @@ Bool_t MyAnalysis::Process(Long64_t entry) {
    }
    //////////////////////////////
 
-   // Exercise 2
-   if (N_Muon == 0) {
 
-      // we have no myons, so it does not make sence, but let it be here
+
+   // Exercise 2
+
+
+   if (this->analysisType == "TTbar") {
+      TTBarEvents++;
+   }
+
+   if (N_IsoMuon > 0) {
+
       for (vector<MyMuon>::iterator it = Muons.begin(); it != Muons.end(); ++it) {
          muonsAngularDistributionEtaGraph->Fill(it->Eta(), EventWeight);
          muonsAngularDistributionPhiGraph->Fill(it->Phi(), EventWeight);
@@ -302,11 +309,20 @@ Bool_t MyAnalysis::Process(Long64_t entry) {
          h_IsolationElectrons->Fill(it->GetIsolation(), EventWeight);
       }
       h_NElectrons->Fill(N_Electrons, EventWeight);
+
+      if (this->analysisType == "TTbar") {
+         SelectedTTBarEvents++;
+      }
    }
+
 
    // MyAnalysis::ProcessExercise3();
 
    return kTRUE;
+}
+
+void MyAnalysis::SetAnalysisType(string analysisType) {
+   this->analysisType = analysisType;
 }
 
 void MyAnalysis::SlaveTerminate() {
@@ -314,6 +330,10 @@ void MyAnalysis::SlaveTerminate() {
    // have been processed. When running with PROOF SlaveTerminate() is called
    // on each slave server.
 
+   if (this->analysisType=="TTbar") {
+      float efficiency = (float) SelectedTTBarEvents / (float) TTBarEvents;
+      cout << "Efficiency: " << SelectedTTBarEvents << " / " << TTBarEvents << " = " << efficiency << endl;
+   }
 }
 
 void MyAnalysis::Terminate() {
