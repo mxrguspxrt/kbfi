@@ -221,6 +221,13 @@ void MyAnalysis::SlaveBegin(TTree * /*tree*/) {
    histograms.push_back(signalBackgroundHistogram);
    histograms_MC.push_back(signalBackgroundHistogram);
 
+   signalBackgroundAfterCutsHistogram = new TH1F("S/B after cuts", "S/B after cuts", 100, 0, 100);
+   signalBackgroundAfterCutsHistogram->SetXTitle("S/B after cuts");
+   signalBackgroundAfterCutsHistogram->Sumw2();
+   histograms.push_back(signalBackgroundAfterCutsHistogram);
+   histograms_MC.push_back(signalBackgroundAfterCutsHistogram);
+
+
 
    // MyAnalysis::DrawExercise3();
 
@@ -314,11 +321,20 @@ Bool_t MyAnalysis::Process(Long64_t entry) {
 
    // Generate Histograms on data without cuts
 
+   bool hasPositiveLepton = false;
+   bool hasNegativeLepton = false;
+
    for (vector<MyMuon>::iterator it = Muons.begin(); it != Muons.end(); ++it) {
       muonsEtaHistogram->Fill(it->Eta(), EventWeight);
       muonsPhiHistogram->Fill(it->Phi(), EventWeight);
       muonsPtHistogram->Fill(it->Pt(), EventWeight);
       muonsChargeHistogram->Fill(it->GetCharge(), EventWeight);
+
+      if (it->GetCharge() == 1) {
+         hasPositiveLepton = true;
+      } else {
+         hasNegativeLepton = true;
+      }
    }
 
    int N_Jets = 0;
@@ -352,6 +368,12 @@ Bool_t MyAnalysis::Process(Long64_t entry) {
       electronsPhiHistogram->Fill(it->Phi(), EventWeight);
       electronsPtHistogram->Fill(it->Pt(), EventWeight);
       electronsChargeHistogram->Fill(it->GetCharge(), EventWeight);
+
+      if (it->GetCharge() == 1) {
+         hasPositiveLepton = true;
+      } else {
+         hasNegativeLepton = true;
+      }
    }
    h_NElectrons->Fill(N_Electrons, EventWeight);
 
@@ -373,9 +395,15 @@ Bool_t MyAnalysis::Process(Long64_t entry) {
    //
    // Must contain:
    //
-   // * at least 2 jets and two oppositely charged leptons
-   // *
+   // * at least 2 jets and two oppositely charged leptons (currently not checking taus)
 
+   bool hasTwoOppositelyChargedLeptons = hasPositiveLepton && hasNegativeLepton;
+
+   if (!(N_Jets >= 2 && hasTwoOppositelyChargedLeptons)) {
+      return kTRUE;
+   }
+
+   signalBackgroundAfterCutsHistogram->Fill(1, EventWeight);
 
    // MyAnalysis::ProcessExercise3();
 

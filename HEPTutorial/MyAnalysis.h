@@ -218,6 +218,7 @@ public:
    TH1F *jetsPtHistogram;
 
    TH1F *signalBackgroundHistogram;
+   TH1F *signalBackgroundAfterCutsHistogram;
 
    vector<TH1F*> histograms;
    vector<TH1F*> histograms_MC;
