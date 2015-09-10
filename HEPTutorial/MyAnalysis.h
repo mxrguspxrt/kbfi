@@ -203,13 +203,21 @@ public:
    TH1F *h_IsolationElectrons;
    TH1F *h_NElectrons;
 
-   TH1F *muonsAngularDistributionEtaGraph;
-   TH1F *muonsAngularDistributionPhiGraph;
-   TH1F *muonsAngularDistributionPtGraph;
+   TH1F *muonsEtaHistogram;
+   TH1F *muonsPhiHistogram;
+   TH1F *muonsPtHistogram;
+   TH1F *muonsChargeHistogram;
 
-   TH1F *jetsAngularDistributionEtaGraph;
-   TH1F *jetsAngularDistributionPhiGraph;
-   TH1F *jetsAngularDistributionPtGraph;
+   TH1F *electronsEtaHistogram;
+   TH1F *electronsPhiHistogram;
+   TH1F *electronsPtHistogram;
+   TH1F *electronsChargeHistogram;
+
+   TH1F *jetsEtaHistogram;
+   TH1F *jetsPhiHistogram;
+   TH1F *jetsPtHistogram;
+
+   TH1F *signalBackgroundHistogram;
 
    vector<TH1F*> histograms;
    vector<TH1F*> histograms_MC;

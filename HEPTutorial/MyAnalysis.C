@@ -28,6 +28,7 @@
 #include <TH1F.h>
 #include <TH3F.h>
 #include <TLatex.h>
+#include <stdlib.h>
 
 using namespace std;
 
@@ -148,41 +149,78 @@ void MyAnalysis::SlaveBegin(TTree * /*tree*/) {
    histograms.push_back(h_NElectrons);
    histograms_MC.push_back(h_NElectrons);
 
-   muonsAngularDistributionEtaGraph = new TH1F("Angular distribution of myons (eta)", "Angular distribution of myons (eta)", 100, -4, 4);
-   muonsAngularDistributionEtaGraph->SetXTitle("Angular distribution of myons (eta)");
-   muonsAngularDistributionEtaGraph->Sumw2();
-   histograms.push_back(muonsAngularDistributionEtaGraph);
-   histograms_MC.push_back(muonsAngularDistributionEtaGraph);
+   muonsEtaHistogram = new TH1F("Muons (eta)", "Muons (eta)", 100, -4, 4);
+   muonsEtaHistogram->SetXTitle("Muons (eta)");
+   muonsEtaHistogram->Sumw2();
+   histograms.push_back(muonsEtaHistogram);
+   histograms_MC.push_back(muonsEtaHistogram);
 
-   muonsAngularDistributionPhiGraph = new TH1F("Angular distribution of myons (phi)", "Angular distribution of myons (phi)", 100, -4, 4);
-   muonsAngularDistributionPhiGraph->SetXTitle("Angular distribution of myons (phi)");
-   muonsAngularDistributionPhiGraph->Sumw2();
-   histograms.push_back(muonsAngularDistributionPhiGraph);
-   histograms_MC.push_back(muonsAngularDistributionPhiGraph);
+   muonsPhiHistogram = new TH1F("Muons (phi)", "Muons (phi)", 100, -4, 4);
+   muonsPhiHistogram->SetXTitle("Muons (phi)");
+   muonsPhiHistogram->Sumw2();
+   histograms.push_back(muonsPhiHistogram);
+   histograms_MC.push_back(muonsPhiHistogram);
 
-   muonsAngularDistributionPtGraph = new TH1F("Angular distribution of myons (pt)", "Angular distribution of myons (pt)", 100, 0, 100);
-   muonsAngularDistributionPtGraph->SetXTitle("Angular distribution of myons (pt)");
-   muonsAngularDistributionPtGraph->Sumw2();
-   histograms.push_back(muonsAngularDistributionPtGraph);
-   histograms_MC.push_back(muonsAngularDistributionPtGraph);
+   muonsPtHistogram = new TH1F("Muons (pt)", "Muons (pt)", 100, 0, 200);
+   muonsPtHistogram->SetXTitle("Muons (pt)");
+   muonsPtHistogram->Sumw2();
+   histograms.push_back(muonsPtHistogram);
+   histograms_MC.push_back(muonsPtHistogram);
 
-   jetsAngularDistributionEtaGraph = new TH1F("Angular distribution of jets (eta)", "Angular distribution of jets (eta)", 100, -4, 4);
-   jetsAngularDistributionEtaGraph->SetXTitle("Angular distribution of jets (eta)");
-   jetsAngularDistributionEtaGraph->Sumw2();
-   histograms.push_back(jetsAngularDistributionEtaGraph);
-   histograms_MC.push_back(jetsAngularDistributionEtaGraph);
+   muonsChargeHistogram = new TH1F("Muons charge", "Muons charge", 100, -2, 2);
+   muonsChargeHistogram->SetXTitle("Muons charge");
+   muonsChargeHistogram->Sumw2();
+   histograms.push_back(muonsChargeHistogram);
+   histograms_MC.push_back(muonsChargeHistogram);
 
-   jetsAngularDistributionPhiGraph = new TH1F("Angular distribution of jets (phi)", "Angular distribution of jets (phi)", 100, -4, 4);
-   jetsAngularDistributionPhiGraph->SetXTitle("Angular distribution of jets (phi)");
-   jetsAngularDistributionPhiGraph->Sumw2();
-   histograms.push_back(jetsAngularDistributionPhiGraph);
-   histograms_MC.push_back(jetsAngularDistributionPhiGraph);
+   electronsEtaHistogram = new TH1F("Electrons (eta)", "Electrons (eta)", 100, -4, 4);
+   electronsEtaHistogram->SetXTitle("Electrons (eta)");
+   electronsEtaHistogram->Sumw2();
+   histograms.push_back(electronsEtaHistogram);
+   histograms_MC.push_back(electronsEtaHistogram);
 
-   jetsAngularDistributionPtGraph = new TH1F("Angular distribution of jets (pt)", "Angular distribution of jets (pt)", 100, 0, 100);
-   jetsAngularDistributionPtGraph->SetXTitle("Angular distribution of jets (pt)");
-   jetsAngularDistributionPtGraph->Sumw2();
-   histograms.push_back(jetsAngularDistributionPtGraph);
-   histograms_MC.push_back(jetsAngularDistributionPtGraph);
+   electronsPhiHistogram = new TH1F("Electrons (phi)", "Electrons (phi)", 100, -4, 4);
+   electronsPhiHistogram->SetXTitle("Electrons (phi)");
+   electronsPhiHistogram->Sumw2();
+   histograms.push_back(electronsPhiHistogram);
+   histograms_MC.push_back(electronsPhiHistogram);
+
+   electronsPtHistogram = new TH1F("Electrons (pt)", "Electrons (pt)", 100, 0, 200);
+   electronsPtHistogram->SetXTitle("Electrons (pt)");
+   electronsPtHistogram->Sumw2();
+   histograms.push_back(electronsPtHistogram);
+   histograms_MC.push_back(electronsPtHistogram);
+
+   electronsChargeHistogram = new TH1F("Electrons charge", "Electrons charge", 100, -2, 2);
+   electronsChargeHistogram->SetXTitle("Electrons charge");
+   electronsChargeHistogram->Sumw2();
+   histograms.push_back(electronsChargeHistogram);
+   histograms_MC.push_back(electronsChargeHistogram);
+
+   jetsEtaHistogram = new TH1F("Jets (eta)", "Jets (eta)", 100, -4, 4);
+   jetsEtaHistogram->SetXTitle("Jets (eta)");
+   jetsEtaHistogram->Sumw2();
+   histograms.push_back(jetsEtaHistogram);
+   histograms_MC.push_back(jetsEtaHistogram);
+
+   jetsPhiHistogram = new TH1F("Jets (phi)", "Jets (phi)", 100, -4, 4);
+   jetsPhiHistogram->SetXTitle("Jets (phi)");
+   jetsPhiHistogram->Sumw2();
+   histograms.push_back(jetsPhiHistogram);
+   histograms_MC.push_back(jetsPhiHistogram);
+
+   jetsPtHistogram = new TH1F("Jets (pt)", "Jets (pt)", 100, 0, 200);
+   jetsPtHistogram->SetXTitle("Jets (pt)");
+   jetsPtHistogram->Sumw2();
+   histograms.push_back(jetsPtHistogram);
+   histograms_MC.push_back(jetsPtHistogram);
+
+   signalBackgroundHistogram = new TH1F("S/B", "S/B", 100, 0, 100);
+   signalBackgroundHistogram->SetXTitle("S/B");
+   signalBackgroundHistogram->Sumw2();
+   histograms.push_back(signalBackgroundHistogram);
+   histograms_MC.push_back(signalBackgroundHistogram);
+
 
    // MyAnalysis::DrawExercise3();
 
@@ -219,26 +257,26 @@ Bool_t MyAnalysis::Process(Long64_t entry) {
    double MuonPtCut = 25.;
    double MuonRelIsoCut = 0.10;
 
-   //   cout << "Jets: " << endl;
-   //   for (vector<MyJet>::iterator it = Jets.begin(); it != Jets.end(); ++it) {
-   //      cout << "pt, eta, phi, btag, id: " << it->Pt() << ", " << it->Eta() << ", " << it->Phi() << ", " << it->IsBTagged() << ", " << it->GetJetID()
-   //      << endl;
-   //   }
-   //   cout << "Muons: " << endl;
-   //   for (vector<MyMuon>::iterator it = Muons.begin(); it != Muons.end(); ++it) {
-   //      cout << "pt, eta, phi, iso, charge: " << it->Pt() << ", " << it->Eta() << ", " << it->Phi() << ", "
-   //      << it->GetIsolation() << ", " << it->GetCharge() << endl;
-   //   }
-   //   cout << "Electrons: " << endl;
-   //   for (vector<MyElectron>::iterator it = Electrons.begin(); it != Electrons.end(); ++it) {
-   //      cout << "pt, eta, phi, iso, charge: " << it->Pt() << ", " << it->Eta() << ", " << it->Phi() << ", "
-   //      << it->GetIsolation() << ", " << it->GetCharge() << endl;
-   //   }
-   //   cout << "Photons: " << endl;
-   //   for (vector<MyPhoton>::iterator it = Photons.begin(); it != Photons.end(); ++it) {
-   //      cout << "pt, eta, phi, iso: " << it->Pt() << ", " << it->Eta() << ", " << it->Phi() << ", " << it->GetIsolation()
-   //      << endl;
-   //   }
+   // cout << "Jets: " << endl;
+   // for (vector<MyJet>::iterator it = Jets.begin(); it != Jets.end(); ++it) {
+   //   cout << "pt, eta, phi, btag, id: " << it->Pt() << ", " << it->Eta() << ", " << it->Phi() << ", " << it->IsBTagged() << ", " << it->GetJetID()
+   //   << endl;
+   // }
+   // cout << "Muons: " << endl;
+   // for (vector<MyMuon>::iterator it = Muons.begin(); it != Muons.end(); ++it) {
+   //   cout << "pt, eta, phi, iso, charge: " << it->Pt() << ", " << it->Eta() << ", " << it->Phi() << ", "
+   //   << it->GetIsolation() << ", " << it->GetCharge() << endl;
+   // }
+   // cout << "Electrons: " << endl;
+   // for (vector<MyElectron>::iterator it = Electrons.begin(); it != Electrons.end(); ++it) {
+   //   cout << "pt, eta, phi, iso, charge: " << it->Pt() << ", " << it->Eta() << ", " << it->Phi() << ", "
+   //   << it->GetIsolation() << ", " << it->GetCharge() << endl;
+   // }
+   // cout << "Photons: " << endl;
+   // for (vector<MyPhoton>::iterator it = Photons.begin(); it != Photons.end(); ++it) {
+   //   cout << "pt, eta, phi, iso: " << it->Pt() << ", " << it->Eta() << ", " << it->Phi() << ", " << it->GetIsolation()
+   //   << endl;
+   // }
 
 
    //////////////////////////////
@@ -270,60 +308,73 @@ Bool_t MyAnalysis::Process(Long64_t entry) {
 
    // Exercise 2
 
-
    if (this->analysisType == "TTbar") {
       TTBarEvents++;
    }
 
-   if (N_IsoMuon > 0) {
+   // Generate Histograms on data without cuts
 
-      for (vector<MyMuon>::iterator it = Muons.begin(); it != Muons.end(); ++it) {
-         muonsAngularDistributionEtaGraph->Fill(it->Eta(), EventWeight);
-         muonsAngularDistributionPhiGraph->Fill(it->Phi(), EventWeight);
-         muonsAngularDistributionPtGraph->Fill(it->Pt(), EventWeight);
+   for (vector<MyMuon>::iterator it = Muons.begin(); it != Muons.end(); ++it) {
+      muonsEtaHistogram->Fill(it->Eta(), EventWeight);
+      muonsPhiHistogram->Fill(it->Phi(), EventWeight);
+      muonsPtHistogram->Fill(it->Pt(), EventWeight);
+      muonsChargeHistogram->Fill(it->GetCharge(), EventWeight);
+   }
+
+   int N_Jets = 0;
+   int N_BtaggedJets = 0;
+
+   for (vector<MyJet>::iterator it = Jets.begin(); it != Jets.end(); ++it) {
+      ++N_Jets;
+      h_MJets->Fill(it->M(), EventWeight);
+      h_PerpJets->Fill(it->Perp(), EventWeight);
+
+      if (it->IsBTagged()) {
+         ++N_BtaggedJets;
       }
 
-      int N_Jets = 0;
-      // https://en.wikipedia.org/wiki/B-tagging
-      int N_BtaggedJets = 0;
-      for (vector<MyJet>::iterator it = Jets.begin(); it != Jets.end(); ++it) {
-         ++N_Jets;
-         h_MJets->Fill(it->M(), EventWeight);
-         h_PerpJets->Fill(it->Perp(), EventWeight);
-
-         if (it->IsBTagged()) {
-            ++N_BtaggedJets;
-         }
-
-         jetsAngularDistributionEtaGraph->Fill(it->Eta(), EventWeight);
-         jetsAngularDistributionPhiGraph->Fill(it->Phi(), EventWeight);
-         jetsAngularDistributionPtGraph->Fill(it->Pt(), EventWeight);
-      }
-      h_NJets->Fill(N_Jets, EventWeight);
-      h_MET->Fill(sqrt(MET_px*MET_px + MET_py*MET_py), EventWeight);
-      h_NBtaggedJets->Fill(N_BtaggedJets);
-
-      int N_Electrons = 0;
-      float highest_pt = 0;
-      for (vector<MyElectron>::iterator it = Electrons.begin(); it != Electrons.end(); ++it) {
-         ++N_Electrons;
-         h_IsolationElectrons->Fill(it->GetIsolation(), EventWeight);
-      }
-      h_NElectrons->Fill(N_Electrons, EventWeight);
+      jetsEtaHistogram->Fill(it->Eta(), EventWeight);
+      jetsPhiHistogram->Fill(it->Phi(), EventWeight);
+      jetsPtHistogram->Fill(it->Pt(), EventWeight);
+   }
+   h_NJets->Fill(N_Jets, EventWeight);
+   h_MET->Fill(sqrt(MET_px*MET_px + MET_py*MET_py), EventWeight);
+   h_NBtaggedJets->Fill(N_BtaggedJets);
 
 
-      float highest_pt_for_isolated_muon = 0;
+   int N_Electrons = 0;
+   float highest_pt = 0;
 
-      for (vector<MyMuon>::iterator it = Muons.begin(); it != Muons.end(); ++it) {
-         if (it->IsIsolated() && highest_pt_for_isolated_muon < it->Pt()) {
-            highest_pt_for_isolated_muon = it->Pt();
-         }
-      }
+   for (vector<MyElectron>::iterator it = Electrons.begin(); it != Electrons.end(); ++it) {
+      ++N_Electrons;
+      h_IsolationElectrons->Fill(it->GetIsolation(), EventWeight);
+      electronsEtaHistogram->Fill(it->Eta(), EventWeight);
+      electronsPhiHistogram->Fill(it->Phi(), EventWeight);
+      electronsPtHistogram->Fill(it->Pt(), EventWeight);
+      electronsChargeHistogram->Fill(it->GetCharge(), EventWeight);
+   }
+   h_NElectrons->Fill(N_Electrons, EventWeight);
 
-      if (this->analysisType == "TTbar" && highest_pt_for_isolated_muon > 25) {
-         SelectedTTBarEvents++;
+
+   float higestPtForIsolatedMuon = 0;
+
+   for (vector<MyMuon>::iterator it = Muons.begin(); it != Muons.end(); ++it) {
+      if (it->IsIsolated() && higestPtForIsolatedMuon < it->Pt()) {
+         higestPtForIsolatedMuon = it->Pt();
       }
    }
+
+   // Generate Histogram that compares signal/background without cuts
+   signalBackgroundHistogram->Fill(1, EventWeight);
+
+
+
+   // Generate Histogram that compares signal/background with cuts
+   //
+   // Must contain:
+   //
+   // * at least 2 jets and two oppositely charged leptons
+   // *
 
 
    // MyAnalysis::ProcessExercise3();
@@ -349,6 +400,6 @@ void MyAnalysis::SlaveTerminate() {
 void MyAnalysis::Terminate() {
    // The Terminate() function is the last function to be called during
    // a query. It always runs on the client, it can be used to present
-   // the results graphically or save the results to file.
+   // the results Histogramically or save the results to file.
 
 }
