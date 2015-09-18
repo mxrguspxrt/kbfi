@@ -13,11 +13,15 @@
 #include <iostream>
 
 #include <TH1F.h>
+#include "TLine.h"
 #include <TStyle.h>
 #include <THStack.h>
 #include <TCanvas.h>
 #include <TLegend.h>
 #include <TROOT.h>
+#include <map>
+
+using namespace std;
 
 
 class Plotter {
@@ -37,6 +41,9 @@ public:
 		bg.push_back(v);
 		bg_names.push_back(n);
 		N_histos = v.size();
+	}
+	void AddLines(map<TH1F*, TLine*> lines) {
+		this->lines = lines;
 	}
 	void ClearBg(){
 		bg.clear();
@@ -61,6 +68,7 @@ private:
 	std::vector < std::string > data_names;
 	std::vector < std::string > bg_names;
 	std::vector < std::string > signal_names;
+	map <TH1F*, TLine*> lines;
 
 	int N_histos;
 

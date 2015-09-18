@@ -26,9 +26,13 @@
 #include "MyAnalysis.h"
 #include <iostream>
 #include <TH1F.h>
+#include <TLine.h>
 #include <TH3F.h>
+#include <TLine.h>
 #include <TLatex.h>
+#include <TCanvas.h>
 #include <stdlib.h>
+#include <map>
 
 using namespace std;
 
@@ -94,143 +98,55 @@ void MyAnalysis::SlaveBegin(TTree * /*tree*/) {
    TString option = GetOption();
 
    // task 1
-   h_Mmumu = new TH1F("Mmumu", "Invariant di-muon mass", 60, 60, 120);
-   h_Mmumu->SetXTitle("m_{#mu#mu}");
-   h_Mmumu->Sumw2();
-   histograms.push_back(h_Mmumu);
-   histograms_MC.push_back(h_Mmumu);
-
-   h_NMuon = new TH1F("NMuon", "Number of muons", 7, 0, 7);
-   h_NMuon->SetXTitle("No. Muons");
-   h_NMuon->Sumw2();
-   histograms.push_back(h_NMuon);
-   histograms_MC.push_back(h_NMuon);
+   h_Mmumu = this->createHistogram("Invariant di-muon mass", 60, 60, 120);
+   h_NMuon = this->createHistogram("Number of muons", 7, 0, 7);
 
    // task 2
-   h_NJets = new TH1F("NJets", "Number of jets", 12, 0, 12);
-   h_NJets->SetXTitle("Number of jets");
-   h_NJets->Sumw2();
-   histograms.push_back(h_NJets);
-   histograms_MC.push_back(h_NJets);
 
-   h_NBtaggedJets = new TH1F("NBtaggedJets", "Number of btagged jets", 12, 0, 12);
-   h_NBtaggedJets->SetXTitle("Number of btagged jets");
-   h_NBtaggedJets->Sumw2();
-   histograms.push_back(h_NBtaggedJets);
-   histograms_MC.push_back(h_NBtaggedJets);
+   TCanvas *nJetsCanvas = new TCanvas("canvas");
 
-   h_MJets = new TH1F("NJets", "Invariant mass of jets", 50, 0, 100);
-   h_MJets->SetXTitle("Invariant mass of jets");
-   h_MJets->Sumw2();
-   histograms.push_back(h_MJets);
-   histograms_MC.push_back(h_MJets);
+   h_NJets = this->createHistogram("Number of jets before cut", 12, 0, 12);
 
-   h_PerpJets = new TH1F("PerpJets", "Tranverse component for jets", 50, 0, 100);
-   h_PerpJets->SetXTitle("Tranverse component for jets");
-   h_PerpJets->Sumw2();
-   histograms.push_back(h_PerpJets);
-   histograms_MC.push_back(h_PerpJets);
+   TLine *h_NJetsLine = new TLine(2, 3000000 , 2, 0);
+   h_NJetsLine->SetLineColor(kRed);
+   this->createLine(h_NJets, h_NJetsLine);
 
-   h_MET = new TH1F("MET", "sqrt(MET_px*MET_px + MET_py*MET_py)", 50, 0, 100);
-   h_MET->SetXTitle("sqrt(MET_px*MET_px + MET_py*MET_py)");
-   h_MET->Sumw2();
-   histograms.push_back(h_MET);
-   histograms_MC.push_back(h_MET);
-
-   h_IsolationElectrons = new TH1F("Electrons isolation", "Electrons isolation", 50, 0, 100);
-   h_IsolationElectrons->SetXTitle("Electrons isolation");
-   h_IsolationElectrons->Sumw2();
-   histograms.push_back(h_IsolationElectrons);
-   histograms_MC.push_back(h_IsolationElectrons);
-
-   h_NElectrons = new TH1F("Electrons count", "Electrons count", 10, 0, 10);
-   h_NElectrons->SetXTitle("Electrons count");
-   h_NElectrons->Sumw2();
-   histograms.push_back(h_NElectrons);
-   histograms_MC.push_back(h_NElectrons);
-
-   muonsEtaHistogram = new TH1F("Muons (eta)", "Muons (eta)", 100, -4, 4);
-   muonsEtaHistogram->SetXTitle("Muons (eta)");
-   muonsEtaHistogram->Sumw2();
-   histograms.push_back(muonsEtaHistogram);
-   histograms_MC.push_back(muonsEtaHistogram);
-
-   muonsPhiHistogram = new TH1F("Muons (phi)", "Muons (phi)", 100, -4, 4);
-   muonsPhiHistogram->SetXTitle("Muons (phi)");
-   muonsPhiHistogram->Sumw2();
-   histograms.push_back(muonsPhiHistogram);
-   histograms_MC.push_back(muonsPhiHistogram);
-
-   muonsPtHistogram = new TH1F("Muons (pt)", "Muons (pt)", 100, 0, 200);
-   muonsPtHistogram->SetXTitle("Muons (pt)");
-   muonsPtHistogram->Sumw2();
-   histograms.push_back(muonsPtHistogram);
-   histograms_MC.push_back(muonsPtHistogram);
-
-   muonsChargeHistogram = new TH1F("Muons charge", "Muons charge", 100, -2, 2);
-   muonsChargeHistogram->SetXTitle("Muons charge");
-   muonsChargeHistogram->Sumw2();
-   histograms.push_back(muonsChargeHistogram);
-   histograms_MC.push_back(muonsChargeHistogram);
-
-   electronsEtaHistogram = new TH1F("Electrons (eta)", "Electrons (eta)", 100, -4, 4);
-   electronsEtaHistogram->SetXTitle("Electrons (eta)");
-   electronsEtaHistogram->Sumw2();
-   histograms.push_back(electronsEtaHistogram);
-   histograms_MC.push_back(electronsEtaHistogram);
-
-   electronsPhiHistogram = new TH1F("Electrons (phi)", "Electrons (phi)", 100, -4, 4);
-   electronsPhiHistogram->SetXTitle("Electrons (phi)");
-   electronsPhiHistogram->Sumw2();
-   histograms.push_back(electronsPhiHistogram);
-   histograms_MC.push_back(electronsPhiHistogram);
-
-   electronsPtHistogram = new TH1F("Electrons (pt)", "Electrons (pt)", 100, 0, 200);
-   electronsPtHistogram->SetXTitle("Electrons (pt)");
-   electronsPtHistogram->Sumw2();
-   histograms.push_back(electronsPtHistogram);
-   histograms_MC.push_back(electronsPtHistogram);
-
-   electronsChargeHistogram = new TH1F("Electrons charge", "Electrons charge", 100, -2, 2);
-   electronsChargeHistogram->SetXTitle("Electrons charge");
-   electronsChargeHistogram->Sumw2();
-   histograms.push_back(electronsChargeHistogram);
-   histograms_MC.push_back(electronsChargeHistogram);
-
-   jetsEtaHistogram = new TH1F("Jets (eta)", "Jets (eta)", 100, -4, 4);
-   jetsEtaHistogram->SetXTitle("Jets (eta)");
-   jetsEtaHistogram->Sumw2();
-   histograms.push_back(jetsEtaHistogram);
-   histograms_MC.push_back(jetsEtaHistogram);
-
-   jetsPhiHistogram = new TH1F("Jets (phi)", "Jets (phi)", 100, -4, 4);
-   jetsPhiHistogram->SetXTitle("Jets (phi)");
-   jetsPhiHistogram->Sumw2();
-   histograms.push_back(jetsPhiHistogram);
-   histograms_MC.push_back(jetsPhiHistogram);
-
-   jetsPtHistogram = new TH1F("Jets (pt)", "Jets (pt)", 100, 0, 200);
-   jetsPtHistogram->SetXTitle("Jets (pt)");
-   jetsPtHistogram->Sumw2();
-   histograms.push_back(jetsPtHistogram);
-   histograms_MC.push_back(jetsPtHistogram);
-
-   signalBackgroundHistogram = new TH1F("S/B", "S/B", 100, 0, 100);
-   signalBackgroundHistogram->SetXTitle("S/B");
-   signalBackgroundHistogram->Sumw2();
-   histograms.push_back(signalBackgroundHistogram);
-   histograms_MC.push_back(signalBackgroundHistogram);
-
-   signalBackgroundAfterCutsHistogram = new TH1F("S/B after cuts", "S/B after cuts", 100, 0, 100);
-   signalBackgroundAfterCutsHistogram->SetXTitle("S/B after cuts");
-   signalBackgroundAfterCutsHistogram->Sumw2();
-   histograms.push_back(signalBackgroundAfterCutsHistogram);
-   histograms_MC.push_back(signalBackgroundAfterCutsHistogram);
-
-
+   h_NJetsAfterCut = this->createHistogram("Number of jets after cut", 12, 0, 12);
+   h_NBtaggedJets = this->createHistogram("Number of btagged jets", 12, 0, 12);
+   h_MJets = this->createHistogram("Invariant mass of jets", 50, 0, 100);
+   h_PerpJets = this->createHistogram("Tranverse component for jets", 50, 0, 100);
+   h_MET = this->createHistogram("sqrt(MET_px*MET_px + MET_py*MET_py)", 50, 0, 100);
+   h_IsolationElectrons = this->createHistogram("Electrons isolation", 50, 0, 100);
+   h_NElectrons = this->createHistogram("Electrons count", 10, 0, 10);
+   muonsEtaHistogram = this->createHistogram("Muons (eta)", 100, -4, 4);
+   muonsPhiHistogram = this->createHistogram("Muons (phi)", 100, -4, 4);
+   muonsPtHistogram = this->createHistogram("Muons (pt)", 100, 0, 200);
+   muonsChargeHistogram = this->createHistogram("Muons charge", 100, -2, 2);
+   electronsEtaHistogram = this->createHistogram("Electrons (eta)", 100, -4, 4);
+   electronsPhiHistogram = this->createHistogram("Electrons (phi)", 100, -4, 4);
+   electronsPtHistogram = this->createHistogram("Electrons (pt)", 100, 0, 200);
+   electronsChargeHistogram = this->createHistogram("Electrons charge", 100, -2, 2);
+   jetsEtaHistogram = this->createHistogram("Jets (eta)", 100, -4, 4);
+   jetsPhiHistogram = this->createHistogram("Jets (phi)", 100, -4, 4);
+   jetsPtHistogram = this->createHistogram("Jets (pt)", 100, 0, 200);
+   signalBackgroundHistogram = this->createHistogram("S/B", 100, 0, 100);
+   signalBackgroundAfterCutsHistogram = this->createHistogram("S/B after cuts", 100, 0, 100);
 
    // MyAnalysis::DrawExercise3();
 
+}
+
+TH1F* MyAnalysis::createHistogram(const char *name, int nbinsx, double xlow, double xup) {
+   TH1F *th1f = new TH1F(name, name, nbinsx, xlow, xup);
+   th1f->SetXTitle(name);
+   th1f->Sumw2();
+   histograms.push_back(th1f);
+   histograms_MC.push_back(th1f);
+   return th1f;
+}
+
+bool MyAnalysis::createLine(TH1F* histogram, TLine* line) {
+   lines[histogram] = line;
 }
 
 Bool_t MyAnalysis::Process(Long64_t entry) {
@@ -315,6 +231,10 @@ Bool_t MyAnalysis::Process(Long64_t entry) {
 
    // Exercise 2
 
+   if (!triggerIsoMu24) {
+      return kTRUE;
+   }
+
    if (this->analysisType == "TTbar") {
       TTBarEvents++;
    }
@@ -337,11 +257,30 @@ Bool_t MyAnalysis::Process(Long64_t entry) {
       }
    }
 
+
    int N_Jets = 0;
-   int N_BtaggedJets = 0;
 
    for (vector<MyJet>::iterator it = Jets.begin(); it != Jets.end(); ++it) {
       ++N_Jets;
+   }
+
+   h_NJets->Fill(N_Jets, EventWeight);
+
+
+
+   if (N_Jets < 2) {
+      return true;
+   }
+
+   h_NJetsAfterCut->Fill(N_Jets, EventWeight);
+
+
+
+
+
+   int N_BtaggedJets = 0;
+
+   for (vector<MyJet>::iterator it = Jets.begin(); it != Jets.end(); ++it) {
       h_MJets->Fill(it->M(), EventWeight);
       h_PerpJets->Fill(it->Perp(), EventWeight);
 
@@ -353,10 +292,8 @@ Bool_t MyAnalysis::Process(Long64_t entry) {
       jetsPhiHistogram->Fill(it->Phi(), EventWeight);
       jetsPtHistogram->Fill(it->Pt(), EventWeight);
    }
-   h_NJets->Fill(N_Jets, EventWeight);
    h_MET->Fill(sqrt(MET_px*MET_px + MET_py*MET_py), EventWeight);
    h_NBtaggedJets->Fill(N_BtaggedJets);
-
 
    int N_Electrons = 0;
    float highest_pt = 0;

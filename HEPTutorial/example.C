@@ -58,27 +58,46 @@ int main() {
    ch9->Process(I);
 
 	Plotter P;
-	P.SetData(A->histograms, std::string("Data"));
-	P.AddBg(B->histograms, std::string("TTbar"));
-	P.AddBg(C->histograms, std::string("Wjets"));
-	P.AddBg(D->histograms, std::string("DY"));
-	P.AddBg(E->histograms, std::string("WW"));
-	P.AddBg(F->histograms, std::string("WZ"));
-	P.AddBg(G->histograms, std::string("ZZ"));
-	P.AddBg(H->histograms, std::string("QCD"));
-	P.AddBg(I->histograms, std::string("single Top"));
+	P.SetData(A->histograms, "Data");
+	P.AddBg(B->histograms, "TTbar");
+	P.AddBg(C->histograms, "Wjets");
+	P.AddBg(D->histograms, "DY");
+	P.AddBg(E->histograms, "WW");
+	P.AddBg(F->histograms, "WZ");
+	P.AddBg(G->histograms, "ZZ");
+	P.AddBg(H->histograms, "QCD");
+	P.AddBg(I->histograms, "single Top");
+   // P.AddLines(A->lines);
+   // P.AddLines(B->lines);
+   // P.AddLines(C->lines);
+   // P.AddLines(D->lines);
+   // P.AddLines(E->lines);
+   // P.AddLines(F->lines);
+   // P.AddLines(G->lines);
+   // P.AddLines(H->lines);
+   // P.AddLines(I->lines);
 
 	P.Plot(string("results.pdf"));
 
 	Plotter P_MC;
-	P_MC.AddBg(B->histograms_MC, std::string("TTbar"));
-	P_MC.AddBg(C->histograms_MC, std::string("Wjets"));
-	P_MC.AddBg(D->histograms_MC, std::string("DY"));
-	P_MC.AddBg(E->histograms_MC, std::string("WW"));
-	P_MC.AddBg(F->histograms_MC, std::string("WZ"));
-	P_MC.AddBg(G->histograms_MC, std::string("ZZ"));
-	P_MC.AddBg(H->histograms_MC, std::string("QCD"));
-	P_MC.AddBg(I->histograms_MC, std::string("single Top"));
+	P_MC.AddBg(B->histograms_MC, "TTbar");
+	P_MC.AddBg(C->histograms_MC, "Wjets");
+	P_MC.AddBg(D->histograms_MC, "DY");
+	P_MC.AddBg(E->histograms_MC, "WW");
+	P_MC.AddBg(F->histograms_MC, "WZ");
+	P_MC.AddBg(G->histograms_MC, "ZZ");
+	P_MC.AddBg(H->histograms_MC, "QCD");
+	P_MC.AddBg(I->histograms_MC, "single Top");
+   // P.AddLines(B->lines);
+   // P.AddLines(C->lines);
+   // P.AddLines(D->lines);
+   // P.AddLines(E->lines);
+   // P.AddLines(F->lines);
+   // P.AddLines(G->lines);
+   // P.AddLines(H->lines);
+   // P.AddLines(I->lines);
+
+
    P_MC.Plot(string("results_MC.pdf"));
 
 

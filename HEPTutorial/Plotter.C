@@ -6,6 +6,7 @@
  */
 
 #include "Plotter.h"
+#include "TLine.h"
 
 Plotter::Plotter() {
 	// TODO Auto-generated constructor stub
@@ -71,15 +72,18 @@ void Plotter::Plot(std::string filename) {
 
 		THStack *hs;
 		TLegend *l;
-      int Nset = data.size() + bg.size() + signal.size();
-      if (Nset > 20)
-         Nset = 20.;
-      l = new TLegend(0.76, 0.95 - 0.8 * Nset / 20., 1.0, 0.95);
-      l->SetFillStyle(1001);
-      l->SetFillColor(kWhite);
-      l->SetLineColor(kWhite);
-      l->SetLineWidth(2);
+
+    int Nset = data.size() + bg.size() + signal.size();
+    if (Nset > 20)
+       Nset = 20.;
+    l = new TLegend(0.76, 0.95 - 0.8 * Nset / 20., 1.0, 0.95);
+    l->SetFillStyle(1001);
+    l->SetFillColor(kWhite);
+    l->SetLineColor(kWhite);
+    l->SetLineWidth(2);
+
 		if (bg.size() > 0) {
+
 			hs = new THStack("hs", bg.at(0).at(i)->GetName());
 			int j = 0;
 			for (std::vector<std::vector<TH1F*> >::const_iterator it = bg.begin(); it != bg.end(); ++it) {
@@ -115,16 +119,18 @@ void Plotter::Plot(std::string filename) {
                   it->at(i)->SetFillColor(kBlack);
                   break;
 				}
-				hs->Add(it->at(i));
-				l->AddEntry(it->at(i), bg_names.at(j).c_str(), "f");
+        TH1F *histogram = it->at(i);
+				hs->Add(histogram);
+				l->AddEntry(histogram, bg_names.at(j).c_str(), "f");
 				++j;
 			}
 		}
 		TCanvas *c = new TCanvas("c", "c", 800, 600);
 		c->SetLogy(DrawLog);
-      std::string plotname;
+    std::string plotname;
+
 		if (data.size() > 0) {
-         plotname = std::string(data.at(0).at(i)->GetName());
+      plotname = std::string(data.at(0).at(i)->GetName());
 			data.at(0).at(i)->SetMaximum(1.5 * data.at(0).at(i)->GetMaximum());
 			data.at(0).at(i)->GetXaxis()->SetTitleOffset(1.3);
 			data.at(0).at(i)->GetYaxis()->SetTitleOffset(1.3);
@@ -132,24 +138,33 @@ void Plotter::Plot(std::string filename) {
 			data.at(0).at(i)->GetXaxis()->SetNdivisions(505);
 			data.at(0).at(i)->Draw("");
 			l->AddEntry(data.at(0).at(i), data_names.at(0).c_str(), "p");
-         if (bg.size() > 0)
-            hs->Draw("histsame");
-         data.at(0).at(i)->SetMarkerStyle(20);
-         data.at(0).at(i)->Draw("psame");
-         l->Draw("same");
-		}
-		if (data.size() == 0 && bg.size() > 0) {
-         plotname = std::string(bg.at(0).at(i)->GetName());
-			hs->Draw("hist");
-         hs->GetXaxis()->SetTitleOffset(1.3);
-         hs->GetXaxis()->SetNdivisions(505);
-         hs->GetYaxis()->SetTitleOffset(1.3);
-         if (bg.size() > 0)
-            hs->GetXaxis()->SetTitle(bg.at(0).at(i)->GetXaxis()->GetTitle());
-         hs->GetYaxis()->SetTitle("Events");
 
-         l->Draw("same");
+      if (bg.size() > 0)
+        hs->Draw("histsame");
+
+      data.at(0).at(i)->SetMarkerStyle(20);
+      data.at(0).at(i)->Draw("psame");
+      l->Draw("same");
 		}
+
+		if (data.size() == 0 && bg.size() > 0) {
+      plotname = std::string(bg.at(0).at(i)->GetName());
+			hs->Draw("hist");
+      hs->GetXaxis()->SetTitleOffset(1.3);
+      hs->GetXaxis()->SetNdivisions(505);
+      hs->GetYaxis()->SetTitleOffset(1.3);
+
+      if (bg.size() > 0)
+        hs->GetXaxis()->SetTitle(bg.at(0).at(i)->GetXaxis()->GetTitle());
+
+      hs->GetYaxis()->SetTitle("Events");
+      l->Draw("same");
+		}
+
+    // TLine *line = new TLine(2, 3000000 , 2, 0);
+    // line->SetLineColor(kRed);
+    // line->Draw("histsame");
+
 //      c->Print((filename+std::string("_")+plotname+std::string(".pdf")).c_str());
 		if (i == 0 && N_histos > 1) {
 			c->Print((filename+std::string("(")).c_str());
