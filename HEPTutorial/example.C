@@ -67,15 +67,15 @@ int main() {
 	P.AddBg(G->histograms, "ZZ");
 	P.AddBg(H->histograms, "QCD");
 	P.AddBg(I->histograms, "single Top");
-   // P.AddLines(A->lines);
-   // P.AddLines(B->lines);
-   // P.AddLines(C->lines);
-   // P.AddLines(D->lines);
-   // P.AddLines(E->lines);
-   // P.AddLines(F->lines);
-   // P.AddLines(G->lines);
-   // P.AddLines(H->lines);
-   // P.AddLines(I->lines);
+   P.AddLines(A->lines);
+   P.AddLines(B->lines);
+   P.AddLines(C->lines);
+   P.AddLines(D->lines);
+   P.AddLines(E->lines);
+   P.AddLines(F->lines);
+   P.AddLines(G->lines);
+   P.AddLines(H->lines);
+   P.AddLines(I->lines);
 
 	P.Plot(string("results.pdf"));
 

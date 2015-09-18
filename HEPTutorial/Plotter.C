@@ -87,39 +87,41 @@ void Plotter::Plot(std::string filename) {
 			hs = new THStack("hs", bg.at(0).at(i)->GetName());
 			int j = 0;
 			for (std::vector<std::vector<TH1F*> >::const_iterator it = bg.begin(); it != bg.end(); ++it) {
+
+        TH1F *histogram = it->at(i);
+
 				switch (j) {
                case 0:
-                  it->at(i)->SetFillColor(kRed);
+                  histogram->SetFillColor(kRed);
                   break;
                case 1:
-                  it->at(i)->SetFillColor(kOrange);
+                  histogram->SetFillColor(kOrange);
                   break;
                case 2:
-                  it->at(i)->SetFillColor(kYellow);
+                  histogram->SetFillColor(kYellow);
                   break;
                case 3:
-                  it->at(i)->SetFillColor(kGreen);
+                  histogram->SetFillColor(kGreen);
                   break;
                case 4:
-                  it->at(i)->SetFillColor(kCyan);
+                  histogram->SetFillColor(kCyan);
                   break;
                case 5:
-                  it->at(i)->SetFillColor(kBlue);
+                  histogram->SetFillColor(kBlue);
                   break;
                case 6:
-                  it->at(i)->SetFillColor(kMagenta);
+                  histogram->SetFillColor(kMagenta);
                   break;
                case 7:
-                  it->at(i)->SetFillColor(kGray);
+                  histogram->SetFillColor(kGray);
                   break;
                case 8:
-                  it->at(i)->SetFillColor(kGray + 2);
+                  histogram->SetFillColor(kGray + 2);
                   break;
                default:
-                  it->at(i)->SetFillColor(kBlack);
+                  histogram->SetFillColor(kBlack);
                   break;
 				}
-        TH1F *histogram = it->at(i);
 				hs->Add(histogram);
 				l->AddEntry(histogram, bg_names.at(j).c_str(), "f");
 				++j;
