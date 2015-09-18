@@ -173,7 +173,6 @@ public:
    virtual void Terminate();
 
    virtual TH1F *createHistogram(const char *name, int nbinsx, double xlow, double xup);
-   virtual bool createLine(TH1F* histogram, TLine* line);
 
    void SetAnalysisType(string analysisType);
    string analysisType;
@@ -200,6 +199,7 @@ public:
    TH1F *h_NJets;
    TH1F *h_NJetsAfterCut;
    TH1F *h_NBtaggedJets;
+   TH1F *h_NBtaggedJetsAfterCut;
    TH1F *h_MJets;
    TH1F *h_PerpJets;
 
@@ -225,9 +225,11 @@ public:
    TH1F *signalBackgroundHistogram;
    TH1F *signalBackgroundAfterCutsHistogram;
 
+   TH1F *hasTwoOppositelyChargedLeptonsHistogram;
+   TH1F *hasTwoOppositelyChargedLeptonsHistogramAfterCut;
+
    vector<TH1F*> histograms;
    vector<TH1F*> histograms_MC;
-   map<TH1F*, TLine*> lines;
 
 };
 

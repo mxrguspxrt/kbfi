@@ -106,13 +106,12 @@ void MyAnalysis::SlaveBegin(TTree * /*tree*/) {
    TCanvas *nJetsCanvas = new TCanvas("canvas");
 
    h_NJets = this->createHistogram("Number of jets before cut", 12, 0, 12);
-
-   TLine *h_NJetsLine = new TLine(2, 3000000 , 2, 0);
-   h_NJetsLine->SetLineColor(kRed);
-   this->createLine(h_NJets, h_NJetsLine);
-
    h_NJetsAfterCut = this->createHistogram("Number of jets after cut", 12, 0, 12);
+   hasTwoOppositelyChargedLeptonsHistogram = this->createHistogram("Has two opposite charged leptons", 2, 0, 2);
+   hasTwoOppositelyChargedLeptonsHistogramAfterCut = this->createHistogram("Has two opposite charged leptons after cut", 2, 0, 2);
    h_NBtaggedJets = this->createHistogram("Number of btagged jets", 12, 0, 12);
+   h_NBtaggedJetsAfterCut = this->createHistogram("Number of btagged after cut", 12, 0, 12);
+
    h_MJets = this->createHistogram("Invariant mass of jets", 50, 0, 100);
    h_PerpJets = this->createHistogram("Tranverse component for jets", 50, 0, 100);
    h_MET = this->createHistogram("sqrt(MET_px*MET_px + MET_py*MET_py)", 50, 0, 100);
@@ -143,10 +142,6 @@ TH1F* MyAnalysis::createHistogram(const char *name, int nbinsx, double xlow, dou
    histograms.push_back(th1f);
    histograms_MC.push_back(th1f);
    return th1f;
-}
-
-bool MyAnalysis::createLine(TH1F* histogram, TLine* line) {
-   lines[histogram] = line;
 }
 
 Bool_t MyAnalysis::Process(Long64_t entry) {
@@ -235,28 +230,12 @@ Bool_t MyAnalysis::Process(Long64_t entry) {
       return kTRUE;
    }
 
-   if (this->analysisType == "TTbar") {
-      TTBarEvents++;
-   }
 
-   // Generate Histograms on data without cuts
+   // Generate Histogram that compares signal/background without cuts
+   signalBackgroundHistogram->Fill(1, EventWeight);
 
-   bool hasPositiveLepton = false;
-   bool hasNegativeLepton = false;
 
-   for (vector<MyMuon>::iterator it = Muons.begin(); it != Muons.end(); ++it) {
-      muonsEtaHistogram->Fill(it->Eta(), EventWeight);
-      muonsPhiHistogram->Fill(it->Phi(), EventWeight);
-      muonsPtHistogram->Fill(it->Pt(), EventWeight);
-      muonsChargeHistogram->Fill(it->GetCharge(), EventWeight);
-
-      if (it->GetCharge() == 1) {
-         hasPositiveLepton = true;
-      } else {
-         hasNegativeLepton = true;
-      }
-   }
-
+   // n jets cut
 
    int N_Jets = 0;
 
@@ -275,25 +254,81 @@ Bool_t MyAnalysis::Process(Long64_t entry) {
    h_NJetsAfterCut->Fill(N_Jets, EventWeight);
 
 
+   // has positive and negative and lepton cut
 
+   bool hasPositiveLepton = false;
+   bool hasNegativeLepton = false;
+
+   for (vector<MyMuon>::iterator it = Muons.begin(); it != Muons.end(); ++it) {
+      if (it->GetCharge() == 1) {
+         hasPositiveLepton = true;
+      } else {
+         hasNegativeLepton = true;
+      }
+   }
+
+   for (vector<MyElectron>::iterator it = Electrons.begin(); it != Electrons.end(); ++it) {
+      if (it->GetCharge() == 1) {
+         hasPositiveLepton = true;
+      } else {
+         hasNegativeLepton = true;
+      }
+   }
+
+   bool hasTwoOppositelyChargedLeptons = hasPositiveLepton && hasNegativeLepton;
+
+   hasTwoOppositelyChargedLeptonsHistogram->Fill((!hasTwoOppositelyChargedLeptons ? 0 : 1), EventWeight);
+
+
+
+   if (!hasTwoOppositelyChargedLeptons) {
+      return true;
+   }
+
+   hasTwoOppositelyChargedLeptonsHistogramAfterCut->Fill((!hasTwoOppositelyChargedLeptons ? 0 : 1), EventWeight);
 
 
    int N_BtaggedJets = 0;
 
    for (vector<MyJet>::iterator it = Jets.begin(); it != Jets.end(); ++it) {
-      h_MJets->Fill(it->M(), EventWeight);
-      h_PerpJets->Fill(it->Perp(), EventWeight);
-
       if (it->IsBTagged()) {
          ++N_BtaggedJets;
       }
+   }
+
+   h_NBtaggedJets->Fill(N_BtaggedJets, EventWeight);
+
+
+   if (N_BtaggedJets < 1) {
+      return true;
+   }
+
+   h_NBtaggedJetsAfterCut->Fill(N_BtaggedJets);
+
+
+
+
+   if (this->analysisType == "TTbar") {
+      TTBarEvents++;
+   }
+
+
+   for (vector<MyMuon>::iterator it = Muons.begin(); it != Muons.end(); ++it) {
+      muonsEtaHistogram->Fill(it->Eta(), EventWeight);
+      muonsPhiHistogram->Fill(it->Phi(), EventWeight);
+      muonsPtHistogram->Fill(it->Pt(), EventWeight);
+      muonsChargeHistogram->Fill(it->GetCharge(), EventWeight);
+   }
+
+   for (vector<MyJet>::iterator it = Jets.begin(); it != Jets.end(); ++it) {
+      h_MJets->Fill(it->M(), EventWeight);
+      h_PerpJets->Fill(it->Perp(), EventWeight);
 
       jetsEtaHistogram->Fill(it->Eta(), EventWeight);
       jetsPhiHistogram->Fill(it->Phi(), EventWeight);
       jetsPtHistogram->Fill(it->Pt(), EventWeight);
    }
    h_MET->Fill(sqrt(MET_px*MET_px + MET_py*MET_py), EventWeight);
-   h_NBtaggedJets->Fill(N_BtaggedJets);
 
    int N_Electrons = 0;
    float highest_pt = 0;
@@ -305,12 +340,6 @@ Bool_t MyAnalysis::Process(Long64_t entry) {
       electronsPhiHistogram->Fill(it->Phi(), EventWeight);
       electronsPtHistogram->Fill(it->Pt(), EventWeight);
       electronsChargeHistogram->Fill(it->GetCharge(), EventWeight);
-
-      if (it->GetCharge() == 1) {
-         hasPositiveLepton = true;
-      } else {
-         hasNegativeLepton = true;
-      }
    }
    h_NElectrons->Fill(N_Electrons, EventWeight);
 
@@ -323,26 +352,8 @@ Bool_t MyAnalysis::Process(Long64_t entry) {
       }
    }
 
-   // Generate Histogram that compares signal/background without cuts
-   signalBackgroundHistogram->Fill(1, EventWeight);
-
-
-
-   // Generate Histogram that compares signal/background with cuts
-   //
-   // Must contain:
-   //
-   // * at least 2 jets and two oppositely charged leptons (currently not checking taus)
-
-   bool hasTwoOppositelyChargedLeptons = hasPositiveLepton && hasNegativeLepton;
-
-   if (!(N_Jets >= 2 && hasTwoOppositelyChargedLeptons)) {
-      return kTRUE;
-   }
-
    signalBackgroundAfterCutsHistogram->Fill(1, EventWeight);
 
-   // MyAnalysis::ProcessExercise3();
 
    return kTRUE;
 }

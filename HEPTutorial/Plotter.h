@@ -42,9 +42,6 @@ public:
 		bg_names.push_back(n);
 		N_histos = v.size();
 	}
-	void AddLines(map<TH1F*, TLine*> lines) {
-		this->lines = lines;
-	}
 	void ClearBg(){
 		bg.clear();
 		bg_names.clear();
@@ -68,7 +65,8 @@ private:
 	std::vector < std::string > data_names;
 	std::vector < std::string > bg_names;
 	std::vector < std::string > signal_names;
-	map <TH1F*, TLine*> lines;
+
+	vector <TLine*> lines;
 
 	int N_histos;
 

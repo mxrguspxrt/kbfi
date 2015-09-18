@@ -163,9 +163,23 @@ void Plotter::Plot(std::string filename) {
       l->Draw("same");
 		}
 
-    // TLine *line = new TLine(2, 3000000 , 2, 0);
-    // line->SetLineColor(kRed);
-    // line->Draw("histsame");
+    if (i==2) {
+      TLine *line = new TLine(2, 500*1000 , 2, 0);
+      line->SetLineColor(kBlack);
+      line->Draw("histsame");
+    }
+
+    if (i==4) {
+      TLine *line = new TLine(1, 35000 , 1, 0);
+      line->SetLineColor(kBlack);
+      line->Draw("histsame");
+    }
+
+    if (i==6) {
+      TLine *line = new TLine(1, 900 , 1, 0);
+      line->SetLineColor(kBlack);
+      line->Draw("histsame");
+    }
 
 //      c->Print((filename+std::string("_")+plotname+std::string(".pdf")).c_str());
 		if (i == 0 && N_histos > 1) {
