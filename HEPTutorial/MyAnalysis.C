@@ -102,7 +102,6 @@ void MyAnalysis::SlaveBegin(TTree * /*tree*/) {
    h_NMuon = this->createHistogram("Number of muons", 7, 0, 7);
 
    // task 2
-
    TCanvas *nJetsCanvas = new TCanvas("canvas");
 
    h_NJets = this->createHistogram("Number of jets before cut", 12, 0, 12);
@@ -131,9 +130,35 @@ void MyAnalysis::SlaveBegin(TTree * /*tree*/) {
    signalBackgroundHistogram = this->createHistogram("S/B", 100, 0, 100);
    signalBackgroundAfterCutsHistogram = this->createHistogram("S/B after cuts", 100, 0, 100);
 
-   // MyAnalysis::DrawExercise3();
+
+   // task 3
+   int pins_count = 100;
+   int xup = 0;
+   int xlow = 200;
+
+   ex3MuonsPtHistogram = this->createHistogram("Muon pt", pins_count, xup, xlow);
+   ex3MuonsPtHistogram->SetXTitle("pT");
+
+   ex3MuonsPtPassedHltHistogram = this->createHistogram("Passed HLT", pins_count, xup, xlow);
+   ex3MuonsPtPassedHltHistogram->SetXTitle("pT");
+
+   ex3EfficiencyHistogram = this->createHistogram("Efficiency", pins_count, xup, xlow);
+   ex3EfficiencyHistogram->SetXTitle("pT");
 
 }
+
+
+double MyAnalysis::getMuonHighestPt() {
+   double muonHighestPt = 0;
+
+   for (vector<MyMuon>::iterator muon = Muons.begin(); muon != Muons.end(); ++muon) {
+      if (muon->IsIsolated() && muon->Pt() > muonHighestPt) {
+         muonHighestPt = muon->Pt();
+      }
+   }
+   return muonHighestPt;
+}
+
 
 TH1F* MyAnalysis::createHistogram(const char *name, int nbinsx, double xlow, double xup) {
    TH1F *th1f = new TH1F(name, name, nbinsx, xlow, xup);
@@ -175,30 +200,17 @@ Bool_t MyAnalysis::Process(Long64_t entry) {
    double MuonPtCut = 25.;
    double MuonRelIsoCut = 0.10;
 
-   // cout << "Jets: " << endl;
-   // for (vector<MyJet>::iterator it = Jets.begin(); it != Jets.end(); ++it) {
-   //   cout << "pt, eta, phi, btag, id: " << it->Pt() << ", " << it->Eta() << ", " << it->Phi() << ", " << it->IsBTagged() << ", " << it->GetJetID()
-   //   << endl;
-   // }
-   // cout << "Muons: " << endl;
-   // for (vector<MyMuon>::iterator it = Muons.begin(); it != Muons.end(); ++it) {
-   //   cout << "pt, eta, phi, iso, charge: " << it->Pt() << ", " << it->Eta() << ", " << it->Phi() << ", "
-   //   << it->GetIsolation() << ", " << it->GetCharge() << endl;
-   // }
-   // cout << "Electrons: " << endl;
-   // for (vector<MyElectron>::iterator it = Electrons.begin(); it != Electrons.end(); ++it) {
-   //   cout << "pt, eta, phi, iso, charge: " << it->Pt() << ", " << it->Eta() << ", " << it->Phi() << ", "
-   //   << it->GetIsolation() << ", " << it->GetCharge() << endl;
-   // }
-   // cout << "Photons: " << endl;
-   // for (vector<MyPhoton>::iterator it = Photons.begin(); it != Photons.end(); ++it) {
-   //   cout << "pt, eta, phi, iso: " << it->Pt() << ", " << it->Eta() << ", " << it->Phi() << ", " << it->GetIsolation()
-   //   << endl;
-   // }
+   ProcessEx1();
+   ProcessEx2();
+   ProcessEx3();
 
 
-   //////////////////////////////
-   // Exercise 1: Invariant Di-Muon mass
+   return kTRUE;
+}
+
+Bool_t MyAnalysis::ProcessEx1() {
+   double MuonPtCut = 25.;
+   double MuonRelIsoCut = 0.10;
 
    int N_Muon = 0;
    int N_IsoMuon = 0;
@@ -220,11 +232,11 @@ Bool_t MyAnalysis::Process(Long64_t entry) {
          h_Mmumu->Fill((*muon1 + *muon2).M(), EventWeight);
       }
    }
-   //////////////////////////////
 
+   return true;
+}
 
-
-   // Exercise 2
+Bool_t MyAnalysis::ProcessEx2() {
 
    if (!triggerIsoMu24) {
       return kTRUE;
@@ -248,7 +260,7 @@ Bool_t MyAnalysis::Process(Long64_t entry) {
 
 
    if (N_Jets < 2) {
-      return true;
+      return kTRUE;
    }
 
    h_NJetsAfterCut->Fill(N_Jets, EventWeight);
@@ -305,14 +317,6 @@ Bool_t MyAnalysis::Process(Long64_t entry) {
 
    h_NBtaggedJetsAfterCut->Fill(N_BtaggedJets);
 
-
-
-
-   if (this->analysisType == "TTbar") {
-      TTBarEvents++;
-   }
-
-
    for (vector<MyMuon>::iterator it = Muons.begin(); it != Muons.end(); ++it) {
       muonsEtaHistogram->Fill(it->Eta(), EventWeight);
       muonsPhiHistogram->Fill(it->Phi(), EventWeight);
@@ -354,12 +358,15 @@ Bool_t MyAnalysis::Process(Long64_t entry) {
 
    signalBackgroundAfterCutsHistogram->Fill(1, EventWeight);
 
-
    return kTRUE;
 }
 
-void MyAnalysis::SetAnalysisType(string analysisType) {
-   this->analysisType = analysisType;
+Bool_t MyAnalysis::ProcessEx3() {
+   return kTRUE;
+}
+
+Bool_t MyAnalysis::ProcessEx4() {
+   return kTRUE;
 }
 
 void MyAnalysis::SlaveTerminate() {

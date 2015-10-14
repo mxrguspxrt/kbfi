@@ -154,6 +154,12 @@ public:
    virtual void Init(TTree *tree);
    virtual Bool_t Notify();
    virtual Bool_t Process(Long64_t entry);
+
+   virtual Bool_t ProcessEx1();
+   virtual Bool_t ProcessEx2();
+   virtual Bool_t ProcessEx3();
+   virtual Bool_t ProcessEx4();
+
    virtual Int_t GetEntry(Long64_t entry, Int_t getall = 0) {
       return fChain ? fChain->GetTree()->GetEntry(entry, getall) : 0;
    }
@@ -178,6 +184,8 @@ public:
    string analysisType;
 
    void BuildEvent();
+
+   double getMuonHighestPt();
 
    int TotalEvents;
    int TTBarEvents;
@@ -227,6 +235,10 @@ public:
 
    TH1F *hasTwoOppositelyChargedLeptonsHistogram;
    TH1F *hasTwoOppositelyChargedLeptonsHistogramAfterCut;
+
+   TH1F *ex3MuonsPtHistogram;
+   TH1F *ex3MuonsPtPassedHltHistogram;
+   TH1F *ex3EfficiencyHistogram;
 
    vector<TH1F*> histograms;
    vector<TH1F*> histograms_MC;

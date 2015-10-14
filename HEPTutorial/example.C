@@ -17,7 +17,6 @@ int main() {
    ch->Process(A);
 
    MyAnalysis *B = new MyAnalysis();
-   B->SetAnalysisType("TTbar");
    TChain* ch2 = new TChain("events");
    ch2->Add("files/ttbar.root");
    ch2->Process(B);
