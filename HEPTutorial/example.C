@@ -6,6 +6,10 @@
 #include <string>
 #include "Ex3.h"
 
+#include "TGraphAsymmErrors.h"
+#include "TCanvas.h"
+#include "TH1F.h"
+
 int main() {
 
    float lumi = 50.;
@@ -83,7 +87,88 @@ int main() {
    P_MC.Plot(string("results_MC.pdf"));
 
 
+
+   // This is my first try of EX3, but it is wrong because
    Ex3* ex3 = new Ex3();
    ex3->GenerateGraph();
+
+
+   // This is my second try of EX3, and it might also be wrong
+   TCanvas *ex3Try2 = new TCanvas("Canvas", "Ex3: trigger effieciency", 200, 10, 700, 500);
+
+   TGraphAsymmErrors *graphA = new TGraphAsymmErrors(A->ex3MuonsPtPassedHltHistogram, A->ex3MuonsPtHistogram);
+   TGraphAsymmErrors *graphB = new TGraphAsymmErrors(B->ex3MuonsPtPassedHltHistogram, B->ex3MuonsPtHistogram);
+   TGraphAsymmErrors *graphC = new TGraphAsymmErrors(C->ex3MuonsPtPassedHltHistogram, C->ex3MuonsPtHistogram);
+   TGraphAsymmErrors *graphD = new TGraphAsymmErrors(D->ex3MuonsPtPassedHltHistogram, D->ex3MuonsPtHistogram);
+   TGraphAsymmErrors *graphE = new TGraphAsymmErrors(E->ex3MuonsPtPassedHltHistogram, E->ex3MuonsPtHistogram);
+   TGraphAsymmErrors *graphF = new TGraphAsymmErrors(F->ex3MuonsPtPassedHltHistogram, F->ex3MuonsPtHistogram);
+   TGraphAsymmErrors *graphG = new TGraphAsymmErrors(G->ex3MuonsPtPassedHltHistogram, G->ex3MuonsPtHistogram);
+   TGraphAsymmErrors *graphH = new TGraphAsymmErrors(H->ex3MuonsPtPassedHltHistogram, H->ex3MuonsPtHistogram);
+   TGraphAsymmErrors *graphI = new TGraphAsymmErrors(I->ex3MuonsPtPassedHltHistogram, I->ex3MuonsPtHistogram);
+
+   graphA->SetLineColor(1);
+   graphB->SetLineColor(9);
+   graphC->SetLineColor(3);
+   graphD->SetLineColor(4);
+   graphE->SetLineColor(5);
+   graphF->SetLineColor(6);
+   graphG->SetLineColor(7);
+   graphH->SetLineColor(8);
+   graphI->SetLineColor(kRed);
+
+   graphA->Draw();
+   graphB->Draw("same");
+   graphC->Draw("same");
+   graphD->Draw("same");
+   graphE->Draw("same");
+   graphF->Draw("same");
+   graphG->Draw("same");
+   graphH->Draw("same");
+   graphI->Draw("same");
+
+   ex3Try2->Print("ex3-asymmerrors-try1.pdf");
+
+
+   // This is my third try (and yes, it is wrong again)
+   TStyle *style = new TStyle("Yo", "My Root Styles");
+   gROOT->SetStyle("Yo");
+
+   TCanvas *ex3Try3 = new TCanvas("Canvas", "Ex3: trigger effieciency", 200, 10, 700, 500);
+
+   TH1F ex3MuonsPtPassedHltHistogram = *B->ex3MuonsPtPassedHltHistogram +
+      *C->ex3MuonsPtPassedHltHistogram +
+      *D->ex3MuonsPtPassedHltHistogram +
+      *E->ex3MuonsPtPassedHltHistogram +
+      *F->ex3MuonsPtPassedHltHistogram +
+      *G->ex3MuonsPtPassedHltHistogram +
+      *H->ex3MuonsPtPassedHltHistogram +
+      *I->ex3MuonsPtPassedHltHistogram;
+
+   TH1F *ex3MuonsPtPassedHltHistogramP = &ex3MuonsPtPassedHltHistogram;
+
+   TH1F ex3MuonsPtHistogram = *B->ex3MuonsPtHistogram +
+      *C->ex3MuonsPtHistogram +
+      *D->ex3MuonsPtHistogram +
+      *E->ex3MuonsPtHistogram +
+      *F->ex3MuonsPtHistogram +
+      *G->ex3MuonsPtHistogram +
+      *H->ex3MuonsPtHistogram +
+      *I->ex3MuonsPtHistogram;
+
+   TH1F *ex3MuonsPtHistogramP = &ex3MuonsPtHistogram;
+
+   TGraphAsymmErrors *graphData = new TGraphAsymmErrors(A->ex3MuonsPtPassedHltHistogram, A->ex3MuonsPtHistogram);
+   TGraphAsymmErrors *graphMC = new TGraphAsymmErrors(ex3MuonsPtPassedHltHistogramP, ex3MuonsPtHistogramP);
+
+   graphData->SetLineColor(1);
+   graphMC->SetLineColor(kRed);
+
+   graphData->GetXaxis()->SetTitle("pT");
+   graphMC->GetXaxis()->SetTitle("pT");
+
+   graphA->Draw();
+   graphMC->Draw("same");
+
+   ex3Try3->Print("ex3-asymmerrors-try3.pdf");
 
 }

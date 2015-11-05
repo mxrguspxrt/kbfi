@@ -23,6 +23,7 @@ void Plotter::Plot(std::string filename) {
 	//gROOT->SetStyle("Plain");
 
 	TStyle *MyStyle = new TStyle("MyStyle","My Root Styles");
+  MyStyle->SetPaperSize(20,24);
 	MyStyle->SetStatColor(0);
 	MyStyle->SetCanvasColor(0);
 	MyStyle->SetPadColor(0);

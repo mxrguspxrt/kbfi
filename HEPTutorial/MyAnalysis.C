@@ -28,11 +28,12 @@
 #include <TH1F.h>
 #include <TLine.h>
 #include <TH3F.h>
-#include <TLine.h>
 #include <TLatex.h>
 #include <TCanvas.h>
 #include <stdlib.h>
 #include <map>
+#include "TGraphAsymmErrors.h"
+#include "TCanvas.h"
 
 using namespace std;
 
@@ -132,18 +133,18 @@ void MyAnalysis::SlaveBegin(TTree * /*tree*/) {
 
 
    // task 3
-   int pins_count = 100;
+   int pins = 100;
    int xup = 0;
    int xlow = 200;
 
-   ex3MuonsPtHistogram = this->createHistogram("Muon pt", pins_count, xup, xlow);
-   ex3MuonsPtHistogram->SetXTitle("pT");
+   ex3MuonsPtHistogram = this->createHistogram("Muon pt", pins, xup, xlow);
+   ex3MuonsPtHistogram->SetXTitle("muon pT");
 
-   ex3MuonsPtPassedHltHistogram = this->createHistogram("Passed HLT", pins_count, xup, xlow);
-   ex3MuonsPtPassedHltHistogram->SetXTitle("pT");
+   ex3MuonsPtPassedHltHistogram = this->createHistogram("Passed HLT", pins, xup, xlow);
+   ex3MuonsPtPassedHltHistogram->SetXTitle("muon passed HLT pT");
 
-   ex3EfficiencyHistogram = this->createHistogram("Efficiency", pins_count, xup, xlow);
-   ex3EfficiencyHistogram->SetXTitle("pT");
+   ex3EfficiencyHistogram = this->createHistogram("Efficiency", pins, xup, xlow);
+   ex3EfficiencyHistogram->SetXTitle("effiency for pT");
 
 }
 
@@ -362,6 +363,47 @@ Bool_t MyAnalysis::ProcessEx2() {
 }
 
 Bool_t MyAnalysis::ProcessEx3() {
+
+   // For our tutorial we will restrict to semi-leptonic decay cascades of pair-produced top quarks.
+   // (Tutorial.pdf 1)
+
+   // In particle physics the semileptonic decay of a hadron refers to a decay through the weak interaction
+   // in which one lepton (and the corresponding neutrino) is produced in addition to one or more hadrons.
+   // (https://en.wikipedia.org/wiki/Semileptonic_decay)
+
+   // The final state consists of two quarks (jets), two b-quarks (b-jets), one charged lepton and one neutrino.
+
+   // We should have one muon or electron, but not both
+   if (NMuon + NElectron != 1) {
+      return true;
+   }
+
+   // We should have 4 jets
+   if (NJet == 4) {
+      return true;
+   }
+
+   // TTbar should have two b-tagged jets
+   int N_BtaggedJets = 0;
+
+   for (vector<MyJet>::iterator it = Jets.begin(); it != Jets.end(); ++it) {
+      if (it->IsBTagged()) {
+         ++N_BtaggedJets;
+      }
+   }
+
+   if (N_BtaggedJets != 2) {
+      return true;
+   }
+
+   // create histograms for pt and ptPassed, because effiency = pt / ptPassed
+   double muonHighestPt = this->getMuonHighestPt();
+   ex3MuonsPtHistogram->Fill(muonHighestPt);
+
+   if (triggerIsoMu24) {
+      ex3MuonsPtPassedHltHistogram->Fill(muonHighestPt, EventWeight);
+   }
+
    return kTRUE;
 }
 
@@ -373,12 +415,16 @@ void MyAnalysis::SlaveTerminate() {
    // The SlaveTerminate() function is called after all entries or objects
    // have been processed. When running with PROOF SlaveTerminate() is called
    // on each slave server.
-
-   if (this->analysisType=="TTbar") {
-      float efficiency = (float) SelectedTTBarEvents / (float) TTBarEvents;
-      cout << "3.2 Efficiency: " << SelectedTTBarEvents << " / " << TTBarEvents << " = " << efficiency << endl;
-   }
 }
+
+// bool MyAnalysis::ex3GenerateGraphs() {
+//    TCanvas *canvas = new TCanvas("Canvas", "A Simple Graph with assymetric error bars", 200, 10, 700, 500);
+//    TGraphAsymmErrors *graph = new TGraphAsymmErrors(ex3MuonsPtPassedHltHistogram, ex3MuonsPtHistogram);
+//    graph->SetTitle("TGraphAsymmErrors Example");
+//    graph->Draw("ALP");
+//    canvas->Print("yo.pdf");
+//    return true;
+// }
 
 void MyAnalysis::Terminate() {
    // The Terminate() function is the last function to be called during
