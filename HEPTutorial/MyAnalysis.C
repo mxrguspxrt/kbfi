@@ -365,6 +365,7 @@ Bool_t MyAnalysis::ProcessEx2() {
 Bool_t MyAnalysis::ProcessEx3() {
 
    // For our tutorial we will restrict to semi-leptonic decay cascades of pair-produced top quarks.
+   // For the purpose of our tutorial, we can take these efficiencies from the simulation.
    // (Tutorial.pdf 1)
 
    // In particle physics the semileptonic decay of a hadron refers to a decay through the weak interaction
@@ -373,13 +374,8 @@ Bool_t MyAnalysis::ProcessEx3() {
 
    // The final state consists of two quarks (jets), two b-quarks (b-jets), one charged lepton and one neutrino.
 
-   // We should have one muon or electron, but not both
-   if (NMuon + NElectron != 1) {
-      return true;
-   }
-
-   // We should have 4 jets
-   if (NJet == 4) {
+   // We should have one muon (TTbar Feynman)
+   if (NMuon != 1) {
       return true;
    }
 

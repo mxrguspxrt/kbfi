@@ -3,4 +3,5 @@ make
 ./example.x
 # open results.pdf
 # open results_MC.pdf
-open yo.pdf
+open ex3-asymmerrors-try3.pdf
+
