@@ -88,13 +88,6 @@ int main() {
 
 
 
-   // This is my first try of EX3, but it is wrong because
-   Ex3* ex3 = new Ex3();
-   ex3->GenerateGraph();
-
-
-   // This is my second try of EX3, and it might also be wrong
-   TCanvas *ex3Try2 = new TCanvas("Canvas", "Ex3: trigger effieciency", 200, 10, 700, 500);
 
    TGraphAsymmErrors *graphA = new TGraphAsymmErrors(A->ex3MuonsPtPassedHltHistogram, A->ex3MuonsPtHistogram);
    TGraphAsymmErrors *graphB = new TGraphAsymmErrors(B->ex3MuonsPtPassedHltHistogram, B->ex3MuonsPtHistogram);
@@ -115,23 +108,6 @@ int main() {
    graphG->SetLineColor(7);
    graphH->SetLineColor(8);
    graphI->SetLineColor(kRed);
-
-   graphA->Draw();
-   graphB->Draw("same");
-   graphC->Draw("same");
-   graphD->Draw("same");
-   graphE->Draw("same");
-   graphF->Draw("same");
-   graphG->Draw("same");
-   graphH->Draw("same");
-   graphI->Draw("same");
-
-   ex3Try2->Print("ex3-asymmerrors-try1.pdf");
-
-
-   // This is my third try (and yes, it is wrong again)
-   TStyle *style = new TStyle("Yo", "My Root Styles");
-   gROOT->SetStyle("Yo");
 
    TCanvas *ex3Try3 = new TCanvas("Canvas", "Ex3: trigger effieciency", 200, 10, 700, 500);
 
