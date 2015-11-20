@@ -236,9 +236,13 @@ public:
    TH1F *hasTwoOppositelyChargedLeptonsHistogram;
    TH1F *hasTwoOppositelyChargedLeptonsHistogramAfterCut;
 
-   TH1F *ex3MuonsPtHistogram;
-   TH1F *ex3MuonsPtPassedHltHistogram;
-   TH1F *ex3EfficiencyHistogram;
+   TH1F *ex3MuonsOver25Pt;
+   TH1F *ex3MuonsOver25PtPassedHlt;
+   TH1F *ex3MuonsOver25PtHltEffiency;
+
+   TH1F *ex3TotalEvents;
+   TH1F *ex3AFterCutsEvents;
+   TH1F *ex3AFterCutsAcceptance;
 
    vector<TH1F*> histograms;
    vector<TH1F*> histograms_MC;

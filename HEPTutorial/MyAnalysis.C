@@ -128,6 +128,7 @@ void MyAnalysis::SlaveBegin(TTree * /*tree*/) {
    jetsEtaHistogram = this->createHistogram("Jets (eta)", 100, -4, 4);
    jetsPhiHistogram = this->createHistogram("Jets (phi)", 100, -4, 4);
    jetsPtHistogram = this->createHistogram("Jets (pt)", 100, 0, 200);
+
    signalBackgroundHistogram = this->createHistogram("S/B", 100, 0, 100);
    signalBackgroundAfterCutsHistogram = this->createHistogram("S/B after cuts", 100, 0, 100);
 
@@ -137,14 +138,23 @@ void MyAnalysis::SlaveBegin(TTree * /*tree*/) {
    int xup = 0;
    int xlow = 200;
 
-   ex3MuonsPtHistogram = this->createHistogram("Muon pt", pins, xup, xlow);
-   ex3MuonsPtHistogram->SetXTitle("muon pT");
+   ex3MuonsOver25Pt = this->createHistogram("Muon pt", pins, xup, xlow);
+   ex3MuonsOver25Pt->SetXTitle("muon pT");
 
-   ex3MuonsPtPassedHltHistogram = this->createHistogram("Passed HLT", pins, xup, xlow);
-   ex3MuonsPtPassedHltHistogram->SetXTitle("muon passed HLT pT");
+   ex3MuonsOver25PtPassedHlt = this->createHistogram("Passed HLT", pins, xup, xlow);
+   ex3MuonsOver25PtPassedHlt->SetXTitle("muon passed HLT pT");
 
-   ex3EfficiencyHistogram = this->createHistogram("Efficiency", pins, xup, xlow);
-   ex3EfficiencyHistogram->SetXTitle("effiency for pT");
+   ex3MuonsOver25PtHltEffiency = this->createHistogram("Efficiency", pins, xup, xlow);
+   ex3MuonsOver25PtHltEffiency->SetXTitle("effiency for pT");
+
+   ex3TotalEvents = this->createHistogram("ex3TotalEvents", pins, xup, xlow);
+   ex3TotalEvents->SetXTitle("ex3TotalEvents");
+
+   ex3AFterCutsEvents = this->createHistogram("ex3AFterCutsEvents", pins, xup, xlow);
+   ex3AFterCutsEvents->SetXTitle("ex3AFterCutsEvents");
+
+   ex3AFterCutsAcceptance = this->createHistogram("ex3AFterCutsAcceptance", pins, xup, xlow);
+   ex3AFterCutsAcceptance->SetXTitle("ex3AFterCutsAcceptance");
 
 }
 
@@ -364,9 +374,14 @@ Bool_t MyAnalysis::ProcessEx2() {
 
 Bool_t MyAnalysis::ProcessEx3() {
 
+
+   ex3TotalEvents->Fill(1, EventWeight);
+
    // For our tutorial we will restrict to semi-leptonic decay cascades of pair-produced top quarks.
    // For the purpose of our tutorial, we can take these efficiencies from the simulation.
    // (Tutorial.pdf 1)
+
+   // The first ingredient is the trigger e ciency ✏trig. We can trust the MC simulation to reproduce this e ciency correctly. Produce the trigger “turn-on” curve which shows the trigger e ciency depending on the muon transverse momentum pT. Calculate the e ciency of triggering top quark events with a reconstructed and isolated muon of pT > 25 GeV?
 
    // In particle physics the semileptonic decay of a hadron refers to a decay through the weak interaction
    // in which one lepton (and the corresponding neutrino) is produced in addition to one or more hadrons.
@@ -374,33 +389,131 @@ Bool_t MyAnalysis::ProcessEx3() {
 
    // The final state consists of two quarks (jets), two b-quarks (b-jets), one charged lepton and one neutrino.
 
-   // We should have one muon (TTbar Feynman)
+
+   // 3.1
+   //
+   // The first ingredient is the trigger e ciency ✏trig.
+   // We can trust the MC simulation to reproduce this e ciency correctly.
+   // Produce the trigger “turn-on” curve which shows the trigger e ciency depending
+   // on the muon transverse momentum pT. Calculate the e ciency of triggering top quark events with
+   // a reconstructed and isolated muon of pT > 25 GeV?
+
+   // Additional diary material: https://docs.google.com/document/d/1E-b1kM4vT5GqBFyYiIsPiGj23XHNZ4TOnWiywftI1Jg/edit#heading=h.bzp2qiwcyr26
+
+   // Important to rembember in the context of this task:
+   //
+   // 1. We have restriction "restrict to semi-leptonic decay cascades of pair-produced top quarks".
+   //    Semi-leptonic = one lepton = one muon in our case.
+   // 2. Lepton-plus-jets final states provides the most accurate measurements ... better signal to background ratio
+   // 3. As 3.2 contains "In addition, the acceptance includes all the selection cuts that have
+   //    been found in Exercise 2. ", I expect that cuts do not apply to 3.1
+
+
+   // it is semileptonic
+
    if (NMuon != 1) {
-      return true;
+      return false;
    }
 
-   // TTbar should have two b-tagged jets
-   int N_BtaggedJets = 0;
 
-   for (vector<MyJet>::iterator it = Jets.begin(); it != Jets.end(); ++it) {
-      if (it->IsBTagged()) {
-         ++N_BtaggedJets;
+   // it is isolated and pt is creater than 25
+
+   MyMuon muon = Muons.at(0);
+
+   if (muon.IsIsolated() != true || muon.Pt() < 25) {
+      return false;
+   }
+
+   ex3MuonsOver25Pt->Fill(muon.Pt(), EventWeight);
+
+   if (triggerIsoMu24) {
+      ex3MuonsOver25PtPassedHlt->Fill(muon.Pt(), EventWeight);
+   }
+
+   // this will contain ex3MuonsOver25PtPassedHlt / ex3MuonsOver25Pt
+
+   ex3MuonsOver25PtHltEffiency;
+
+
+
+
+   // 3.2
+
+   // The second ingredient is the acceptance ✏acc (not including the trigger).
+   // This includes the fact that we only select semi-leptonic top quark decays with muons.
+   // The branching fraction is well known, so we can take it from simulation.
+   // In addition, the acceptance includes all the selection cuts that have been found in Exercise 2.
+   // You can calculate the acceptance by comparing the number of generated top quark events with the
+   // number of selected events, after all your cuts.
+
+   // Important to rembember:
+   //
+   // 1. Does not include trigger (but includes the fact that N(Muons)=1 and Pt(Muon)>25)
+   // 2. Branching ratio for muon + jets is 14.8%, but we should take it from simulation.
+   //    HOW? Just select one muon with some b-tagged jets?
+   // 3. Acceptance = Number of selected events after cuts / Number of generated top quark events
+   // 4. In the name of science I am creating new cuts here
+
+
+   // cut for 1 b-tagged jets (there should be 2, but 1 is maybe not read)
+
+   int count2BTaggedJets = 0;
+   for (vector<MyJet>::iterator jet = Jets.begin(); jet != Jets.end(); ++jet) {
+      if (jet->IsBTagged()) {
+         count2BTaggedJets++;
       }
    }
 
-   if (N_BtaggedJets != 2) {
-      return true;
+   if (count2BTaggedJets < 1) {
+      return false;
    }
 
-   // create histograms for pt and ptPassed, because effiency = pt / ptPassed
-   double muonHighestPt = this->getMuonHighestPt();
-   ex3MuonsPtHistogram->Fill(muonHighestPt);
 
-   if (triggerIsoMu24) {
-      ex3MuonsPtPassedHltHistogram->Fill(muonHighestPt, EventWeight);
-   }
+   ex3AFterCutsEvents->Fill(1, EventWeight);
 
-   return kTRUE;
+
+   // this will contain Number of selected events after cuts / Number of generated top quark events
+
+   ex3AFterCutsAcceptance;
+
+
+
+   // 3.3
+
+   // background subtraction: we also trust the simulation to correctly predict
+   // the number of back- ground events after selection.
+   // Subtract the expected background from the observed (selected) data events.
+
+
+
+   // // We should have one muon (TTbar Feynman)
+   // if (NMuon != 1) {
+   //    return true;
+   // }
+
+   // // TTbar should have two b-tagged jets
+   // int N_BtaggedJets = 0;
+
+   // for (vector<MyJet>::iterator it = Jets.begin(); it != Jets.end(); ++it) {
+   //    if (it->IsBTagged()) {
+   //       ++N_BtaggedJets;
+   //    }
+   // }
+
+   // if (N_BtaggedJets != 2) {
+   //    return true;
+   // }
+
+   // // create histograms for pt and ptPassed, because effiency = pt / ptPassed
+   // double muonHighestPt = this->getMuonHighestPt();
+   // ex3MuonsPtHistogram->Fill(muonHighestPt);
+
+   // if (triggerIsoMu24) {
+   //    ex3MuonsPtPassedHltHistogram->Fill(muonHighestPt, EventWeight);
+   // }
+
+   // return kTRUE;
+   return true;
 }
 
 Bool_t MyAnalysis::ProcessEx4() {
@@ -411,6 +524,11 @@ void MyAnalysis::SlaveTerminate() {
    // The SlaveTerminate() function is called after all entries or objects
    // have been processed. When running with PROOF SlaveTerminate() is called
    // on each slave server.
+
+   // ex3 generate effiency
+
+   ex3MuonsOver25PtHltEffiency->Divide(ex3MuonsOver25PtPassedHlt, ex3MuonsOver25Pt);
+   ex3AFterCutsAcceptance->Divide(ex3AFterCutsEvents, ex3TotalEvents);
 }
 
 // bool MyAnalysis::ex3GenerateGraphs() {
