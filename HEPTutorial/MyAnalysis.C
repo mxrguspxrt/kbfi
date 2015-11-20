@@ -214,6 +214,7 @@ Bool_t MyAnalysis::Process(Long64_t entry) {
    ProcessEx1();
    ProcessEx2();
    ProcessEx3();
+   Eyeball();
 
 
    return kTRUE;
@@ -455,6 +456,9 @@ Bool_t MyAnalysis::ProcessEx3() {
    // 4. In the name of science I am creating new cuts here
 
 
+   // HOW: data.
+
+
    // cut for 1 b-tagged jets (there should be 2, but 1 is maybe not read)
 
    int count2BTaggedJets = 0;
@@ -483,6 +487,8 @@ Bool_t MyAnalysis::ProcessEx3() {
    // background subtraction: we also trust the simulation to correctly predict
    // the number of back- ground events after selection.
    // Subtract the expected background from the observed (selected) data events.
+
+   // see example.c
 
 
 
@@ -513,6 +519,30 @@ Bool_t MyAnalysis::ProcessEx3() {
    // }
 
    // return kTRUE;
+   return true;
+}
+
+Bool_t MyAnalysis::Eyeball() {
+   if(TotalEvents > 20) {
+      return true;
+   }
+
+   // construct vectors for both. if px, py, pz can vary a bit, angles phi and eta should remain. also calculate delta R.
+   for (vector<MyJet>::iterator jet = Jets.begin(); jet != Jets.end(); ++jet) {
+      cout << "--------\n";
+      cout << "Jet: (" << jet->Px() << ", " << jet->Py() << ", " << jet->Pz() << ") (" << jet->Phi() << ", " << jet->Eta() << ")\n";
+
+      if (jet->Px() == MChadronicBottom_px) {
+         cout << "Is from hadronic bottom \n";
+      }
+
+      if (jet->Px() == MCleptonicBottom_px) {
+         cout << "Is from leptonic bottom \n";
+      }
+   }
+
+   cout << "MCHadB_px: " << MChadronicBottom_px << "\t MCHadB_py: " << MChadronicBottom_py << "\t MCHadB_pz: " << MChadronicBottom_pz << "\nMCLepB_px: " << MCleptonicBottom_px << "\t MCLepB_py: " << MCleptonicBottom_py << "\t MCLepB_pz: " << MCleptonicBottom_pz << "\n";
+
    return true;
 }
 

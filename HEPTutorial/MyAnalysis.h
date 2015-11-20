@@ -159,6 +159,7 @@ public:
    virtual Bool_t ProcessEx2();
    virtual Bool_t ProcessEx3();
    virtual Bool_t ProcessEx4();
+   virtual Bool_t Eyeball();
 
    virtual Int_t GetEntry(Long64_t entry, Int_t getall = 0) {
       return fChain ? fChain->GetTree()->GetEntry(entry, getall) : 0;

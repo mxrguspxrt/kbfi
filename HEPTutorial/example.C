@@ -10,54 +10,62 @@
 #include "TCanvas.h"
 #include "TH1F.h"
 
-using std::string;
-using std::map;
+using namespace std;
 
 int main() {
 
    float lumi = 50.;
 
    // https://root.cern.ch/root/html/TChain.html
+   cout << "\n\nDATA:\n";
    MyAnalysis *A = new MyAnalysis();
    TChain* ch = new TChain("events");
    ch->Add("files/data.root");
    ch->Process(A);
 
+   cout << "\n\nTTBar:\n";
    MyAnalysis *B = new MyAnalysis();
    TChain* ch2 = new TChain("events");
    ch2->Add("files/ttbar.root");
    ch2->Process(B);
 
+   cout << "\n\nWjets:\n";
    MyAnalysis *C = new MyAnalysis();
    TChain* ch3 = new TChain("events");
    ch3->Add("files/wjets.root");
    ch3->Process(C);
 
+   cout << "\n\nDY:\n";
    MyAnalysis *D = new MyAnalysis();
    TChain* ch4 = new TChain("events");
    ch4->Add("files/dy.root");
    ch4->Process(D);
 
+   cout << "\n\nWW:\n";
    MyAnalysis *E = new MyAnalysis();
    TChain* ch5 = new TChain("events");
    ch5->Add("files/ww.root");
    ch5->Process(E);
 
+   cout << "\n\nWZ:\n";
    MyAnalysis *F = new MyAnalysis();
    TChain* ch6 = new TChain("events");
    ch6->Add("files/wz.root");
    ch6->Process(F);
 
+   cout << "\n\nZZ:\n";
    MyAnalysis *G = new MyAnalysis();
    TChain* ch7 = new TChain("events");
    ch7->Add("files/zz.root");
    ch7->Process(G);
 
+   cout << "\n\nQCD:\n";
    MyAnalysis *H = new MyAnalysis();
    TChain* ch8 = new TChain("events");
    ch8->Add("files/qcd.root");
    ch8->Process(H);
 
+   cout << "\n\nSigleTop:\n";
    MyAnalysis *I = new MyAnalysis();
    TChain* ch9 = new TChain("events");
    ch9->Add("files/single_top.root");
@@ -90,9 +98,13 @@ int main() {
    P_MC.Plot(string("results_MC.pdf"));
 
 
+   // 3.3
+
+   // background subtraction: we also trust the simulation to correctly predict
+   // the number of back- ground events after selection.
+   // Subtract the expected background from the observed (selected) data events.
+
    TCanvas *ex3EffiencyCanvas = new TCanvas("Canvas", "Ex3: trigger effieciency", 200, 10, 700, 500);
-
-
 
    ex3EffiencyCanvas->Print("ex3.pdf");
 
