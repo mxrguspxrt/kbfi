@@ -34,6 +34,7 @@
 #include <map>
 #include "TGraphAsymmErrors.h"
 #include "TCanvas.h"
+#include <stdlib.h>
 
 using namespace std;
 
@@ -523,25 +524,87 @@ Bool_t MyAnalysis::ProcessEx3() {
 }
 
 Bool_t MyAnalysis::Eyeball() {
-   if(TotalEvents > 20) {
-      return true;
-   }
 
-   // construct vectors for both. if px, py, pz can vary a bit, angles phi and eta should remain. also calculate delta R.
-   for (vector<MyJet>::iterator jet = Jets.begin(); jet != Jets.end(); ++jet) {
-      cout << "--------\n";
-      cout << "Jet: (" << jet->Px() << ", " << jet->Py() << ", " << jet->Pz() << ") (" << jet->Phi() << ", " << jet->Eta() << ")\n";
+   // we are eyeballing only first 20 events
 
-      if (jet->Px() == MChadronicBottom_px) {
-         cout << "Is from hadronic bottom \n";
+   bool displayOutput = TotalEvents < 20;
+
+
+   // we want eta and phi
+
+   TLorentzVector *mcHadronicBottomJet = new TLorentzVector();
+   mcHadronicBottomJet->SetXYZM(MChadronicBottom_px, MChadronicBottom_py, MChadronicBottom_pz, 0);
+
+   TLorentzVector *mcLeptonicBottomJet = new TLorentzVector();
+   mcLeptonicBottomJet->SetXYZM(MCleptonicBottom_px, MCleptonicBottom_py, MCleptonicBottom_pz, 0);
+
+
+   // construct vectors for both. if px, py, pz can vary a bit, angles phi and eta should remain.
+   // also calculate delta R.
+
+   bool eventHasHadronicBottom = false;
+   bool eventHasLeptonicBottom = false;
+
+   MyJet *foundHadronicBottomJet = NULL;
+   MyJet *foundLeptonicBottomJet = NULL;
+
+   for (int i = 0; i < Jets.size(); ++i) {
+
+      MyJet *jet = &Jets.at(i);
+
+      bool isFromHadronicBottom = abs(jet->Px() - MChadronicBottom_px) < 10 &&
+                                   abs(jet->Py() - MChadronicBottom_py) < 10 &&
+                                   abs(jet->Pz() - MChadronicBottom_pz) < 10;
+
+      bool isFromLeptonicBottom = abs(jet->Px() - MCleptonicBottom_px) < 10 &&
+                                   abs(jet->Py() - MCleptonicBottom_py) < 10 &&
+                                   abs(jet->Pz() - MCleptonicBottom_pz) < 10;
+
+      if (isFromHadronicBottom) {
+         eventHasHadronicBottom = true;
+         foundHadronicBottomJet = (MyJet*) jet;
       }
 
-      if (jet->Px() == MCleptonicBottom_px) {
-         cout << "Is from leptonic bottom \n";
+      if (isFromLeptonicBottom) {
+         eventHasLeptonicBottom = true;
+         foundLeptonicBottomJet = (MyJet*) jet;
       }
+
+      if (displayOutput) {
+         cout << "Jet: (" << jet->Px() << ", " << jet->Py() << ", " << jet->Pz() << ") (" << jet->Phi() << ", " << jet->Eta() << ") " << jet->GetBTagDiscriminator() << (isFromHadronicBottom ? " hadronic" : "") << (isFromLeptonicBottom ? " leptonic" : "") << "\n";
+      }
+
    }
 
-   cout << "MCHadB_px: " << MChadronicBottom_px << "\t MCHadB_py: " << MChadronicBottom_py << "\t MCHadB_pz: " << MChadronicBottom_pz << "\nMCLepB_px: " << MCleptonicBottom_px << "\t MCLepB_py: " << MCleptonicBottom_py << "\t MCLepB_pz: " << MCleptonicBottom_pz << "\n";
+   if (displayOutput) {
+      cout << "MC Hadronic bottom: " << "(" << MChadronicBottom_px << ", " << MChadronicBottom_py << ", " << MChadronicBottom_pz << ") (" << mcHadronicBottomJet->Phi() << ", " << mcHadronicBottomJet->Eta() << ")\n";
+      cout << "MC Leptonic bottom: " << "(" << MCleptonicBottom_px << ", " << MCleptonicBottom_py << ", " << MCleptonicBottom_pz << ") (" << mcLeptonicBottomJet->Phi() << ", " << mcLeptonicBottomJet->Eta() << ")\n";
+   }
+
+   if (eventHasHadronicBottom && eventHasLeptonicBottom) {
+
+      if (displayOutput) {
+         cout << "Event is semi-leptonic decay.\n";
+      }
+
+      SemiLeptonicDecayEvents++;
+
+      if (foundHadronicBottomJet->GetBTagDiscriminator() > 1.74 && foundLeptonicBottomJet->GetBTagDiscriminator() > 1.74) {
+         SemiLeptonicDecayEventsWithGoodEnoughBTag++;
+
+         if (displayOutput) {
+            cout << "Event has also good enough BTags.\n";
+         }
+
+      }
+
+   }
+
+   if (displayOutput) {
+      cout << "\n";
+   }
+
+   // delta R matchimine, b taggimine
 
    return true;
 }
@@ -556,6 +619,14 @@ void MyAnalysis::SlaveTerminate() {
    // on each slave server.
 
    // ex3 generate effiency
+
+   int semiLeptonicDecayEventsProcent = ((float)SemiLeptonicDecayEvents / (float)TotalEvents) * 100;
+   int semiLeptonicDecayEventsWithGoodEnoughBTagProcent = ((float)SemiLeptonicDecayEventsWithGoodEnoughBTag / (float)TotalEvents) * 100;
+
+   cout << "EventWeight: " << EventWeight << "\n";
+   cout << "TotalEvents: " << TotalEvents << "\n";
+   cout << "SemiLeptonicDecayEvents: " << SemiLeptonicDecayEvents << " (" << semiLeptonicDecayEventsProcent << "%) \n";
+   cout << "SemiLeptonicDecayEventsWithGoodEnoughBTag: " << semiLeptonicDecayEventsWithGoodEnoughBTagProcent << " ( " << SemiLeptonicDecayEventsWithGoodEnoughBTagProcent << "%) \n";
 
    ex3MuonsOver25PtHltEffiency->Divide(ex3MuonsOver25PtPassedHlt, ex3MuonsOver25Pt);
    ex3AFterCutsAcceptance->Divide(ex3AFterCutsEvents, ex3TotalEvents);

@@ -189,8 +189,9 @@ public:
    double getMuonHighestPt();
 
    int TotalEvents;
-   int TTBarEvents;
-   int SelectedTTBarEvents;
+   int SemiLeptonicDecayEvents;
+   int SemiLeptonicDecayEventsWithGoodEnoughBTag;
+
    vector<MyJet> Jets;
    vector<MyMuon> Muons;
    vector<MyElectron> Electrons;
@@ -321,8 +322,8 @@ void MyAnalysis::Init(TTree *tree)
    fChain->SetBranchAddress("EventWeight", &EventWeight, &b_EventWeight);
 
    TotalEvents = 0;
-   TTBarEvents = 0;
-   SelectedTTBarEvents = 0;
+   SemiLeptonicDecayEvents = 0;
+   SemiLeptonicDecayEventsWithGoodEnoughBTag = 0;
 }
 
 Bool_t MyAnalysis::Notify()
