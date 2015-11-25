@@ -11,6 +11,8 @@
 #include <TLorentzVector.h>
 #include <TRandom3.h>
 
+using namespace std;
+
 class MyJet: public TLorentzVector {
 
    public:
@@ -36,16 +38,27 @@ class MyJet: public TLorentzVector {
          return (btag > th);
       }
       ;
-   
+
       void SetJetID(bool id) {
          jetid = id;
       }
       ;
-      
+
       const bool GetJetID() {
          return jetid;
       }
       ;
+
+      const string toString() {
+         string px = to_string(this->Px());
+         string py = to_string(this->Py());
+         string pz = to_string(this->Pz());
+         string phi = to_string(this->Phi());
+         string eta = to_string(this->Eta());
+         string bTag = to_string(this->GetBTagDiscriminator());
+
+         return "(" + px + ", " + py + ", " + pz + ") PhiAndEta(" + phi + ", " + eta + ") bTag: " + bTag;
+      }
 
 
    private:

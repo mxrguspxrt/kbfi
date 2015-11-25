@@ -160,6 +160,7 @@ public:
    virtual Bool_t ProcessEx3();
    virtual Bool_t ProcessEx4();
    virtual Bool_t Eyeball();
+   virtual void logValueAndProcent(string key, int value, int total);
 
    virtual Int_t GetEntry(Long64_t entry, Int_t getall = 0) {
       return fChain ? fChain->GetTree()->GetEntry(entry, getall) : 0;
@@ -189,8 +190,16 @@ public:
    double getMuonHighestPt();
 
    int TotalEvents;
-   int SemiLeptonicDecayEvents;
-   int SemiLeptonicDecayEventsWithGoodEnoughBTag;
+
+   int RealMcHadronicCount;
+   int RealMcLeptonicCount;
+   int RealMcSemiLeptonicDecayEvents;
+   int ConstructedMcHadronicCount;
+   int ConstructedMcLeptonicCount;
+   int ConstructedMcSemiLeptonicDecayEvents;
+   int ConstructedMcHadronicWithGoodBtagCount;
+   int ConstructedMcLeptonicWithGoodBtagCount;
+   int ConstructedMcHadronicAndLeptonicWithGoodBtagCount;
 
    vector<MyJet> Jets;
    vector<MyMuon> Muons;
@@ -322,8 +331,16 @@ void MyAnalysis::Init(TTree *tree)
    fChain->SetBranchAddress("EventWeight", &EventWeight, &b_EventWeight);
 
    TotalEvents = 0;
-   SemiLeptonicDecayEvents = 0;
-   SemiLeptonicDecayEventsWithGoodEnoughBTag = 0;
+
+   RealMcHadronicCount = 0;
+   RealMcLeptonicCount = 0;
+   RealMcSemiLeptonicDecayEvents = 0;
+   ConstructedMcHadronicCount = 0;
+   ConstructedMcLeptonicCount = 0;
+   ConstructedMcSemiLeptonicDecayEvents = 0;
+   ConstructedMcHadronicWithGoodBtagCount = 0;
+   ConstructedMcLeptonicWithGoodBtagCount = 0;
+   ConstructedMcHadronicAndLeptonicWithGoodBtagCount = 0;
 }
 
 Bool_t MyAnalysis::Notify()

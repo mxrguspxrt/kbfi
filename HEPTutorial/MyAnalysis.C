@@ -530,74 +530,122 @@ Bool_t MyAnalysis::Eyeball() {
    bool displayOutput = TotalEvents < 20;
 
 
-   // we want eta and phi
+   // get real data about MC event
 
-   TLorentzVector *mcHadronicBottomJet = new TLorentzVector();
-   mcHadronicBottomJet->SetXYZM(MChadronicBottom_px, MChadronicBottom_py, MChadronicBottom_pz, 0);
+   MyJet *realMcHadronicBottomJet;
+   MyJet *realMcLeptonicBottomJet;
+   bool hasRealMcHadronicBottomJet;
+   bool hasRealMcLeptonicBottomJet;
 
-   TLorentzVector *mcLeptonicBottomJet = new TLorentzVector();
-   mcLeptonicBottomJet->SetXYZM(MCleptonicBottom_px, MCleptonicBottom_py, MCleptonicBottom_pz, 0);
+   if (MChadronicBottom_px != 0) {
+      realMcHadronicBottomJet = new MyJet();
+      realMcHadronicBottomJet->SetXYZM(MChadronicBottom_px, MChadronicBottom_py, MChadronicBottom_pz, 0);
+      hasRealMcHadronicBottomJet = true;
+
+      if (displayOutput) {
+         cout << "realMcHadronicBottomJet: " << realMcHadronicBottomJet->toString() << "\n";
+      }
+
+      RealMcHadronicCount++;
+   }
+
+   if (MCleptonicBottom_px != 0) {
+      realMcLeptonicBottomJet = new MyJet();
+      realMcLeptonicBottomJet->SetXYZM(MCleptonicBottom_px, MCleptonicBottom_py, MCleptonicBottom_pz, 0);
+      hasRealMcLeptonicBottomJet = true;
+
+      if (displayOutput) {
+         cout << "realMcLeptonicBottomJet: " << realMcLeptonicBottomJet->toString() << "\n";
+      }
+
+      RealMcLeptonicCount++;
+   }
+
+   if (hasRealMcHadronicBottomJet && hasRealMcLeptonicBottomJet) {
+      RealMcSemiLeptonicDecayEvents++;
+   }
 
 
    // construct vectors for both. if px, py, pz can vary a bit, angles phi and eta should remain.
    // also calculate delta R.
 
-   bool eventHasHadronicBottom = false;
-   bool eventHasLeptonicBottom = false;
-
-   MyJet *foundHadronicBottomJet = NULL;
-   MyJet *foundLeptonicBottomJet = NULL;
+   MyJet *constructedMcHadronicBottomJet;
+   MyJet *constructedMcLeptonicBottomJet;
+   bool hasConstructedMcHadronicBottomJet;
+   bool hasConstructedMcLeptonicBottomJet;
 
    for (int i = 0; i < Jets.size(); ++i) {
 
       MyJet *jet = &Jets.at(i);
 
-      bool isFromHadronicBottom = abs(jet->Px() - MChadronicBottom_px) < 10 &&
-                                   abs(jet->Py() - MChadronicBottom_py) < 10 &&
-                                   abs(jet->Pz() - MChadronicBottom_pz) < 10;
+      double deltaRFromRealMcHadronicBottomJet;
+      double deltaRFromRealMcLeptonicBottomJet;
 
-      bool isFromLeptonicBottom = abs(jet->Px() - MCleptonicBottom_px) < 10 &&
-                                   abs(jet->Py() - MCleptonicBottom_py) < 10 &&
-                                   abs(jet->Pz() - MCleptonicBottom_pz) < 10;
-
-      if (isFromHadronicBottom) {
-         eventHasHadronicBottom = true;
-         foundHadronicBottomJet = (MyJet*) jet;
+      if (hasRealMcHadronicBottomJet) {
+         deltaRFromRealMcHadronicBottomJet = realMcHadronicBottomJet->DeltaR(*jet);
       }
 
-      if (isFromLeptonicBottom) {
-         eventHasLeptonicBottom = true;
-         foundLeptonicBottomJet = (MyJet*) jet;
+      if (hasRealMcLeptonicBottomJet) {
+         deltaRFromRealMcLeptonicBottomJet = realMcLeptonicBottomJet->DeltaR(*jet);
       }
+
+      bool isFromHadronicBottomDecay = hasRealMcHadronicBottomJet &&
+                                   abs(jet->Px() - MChadronicBottom_px) < 20 &&
+                                   abs(jet->Py() - MChadronicBottom_py) < 20 &&
+                                   abs(jet->Pz() - MChadronicBottom_pz) < 20 &&
+                                   abs(deltaRFromRealMcHadronicBottomJet) < 0.1;
+
+      bool isFromLeptonicBottomDecay = hasRealMcLeptonicBottomJet &&
+                                   abs(jet->Px() - MCleptonicBottom_px) < 20 &&
+                                   abs(jet->Py() - MCleptonicBottom_py) < 20 &&
+                                   abs(jet->Pz() - MCleptonicBottom_pz) < 20 &&
+                                   abs(deltaRFromRealMcLeptonicBottomJet) < 0.1;;
+
+      if (isFromHadronicBottomDecay) {
+         constructedMcHadronicBottomJet = (MyJet*) jet;
+         hasConstructedMcHadronicBottomJet = true;
+         ConstructedMcHadronicCount++;
+      }
+
+      if (isFromLeptonicBottomDecay) {
+         constructedMcLeptonicBottomJet = (MyJet*) jet;
+         hasConstructedMcLeptonicBottomJet = true;
+         ConstructedMcLeptonicCount++;
+      }
+
 
       if (displayOutput) {
-         cout << "Jet: (" << jet->Px() << ", " << jet->Py() << ", " << jet->Pz() << ") (" << jet->Phi() << ", " << jet->Eta() << ") " << jet->GetBTagDiscriminator() << (isFromHadronicBottom ? " hadronic" : "") << (isFromLeptonicBottom ? " leptonic" : "") << "\n";
-      }
+         cout << "ConstructedJet: ";
+         cout << jet->toString();
+         cout << ", deltaR(" << deltaRFromRealMcHadronicBottomJet << ", " << deltaRFromRealMcLeptonicBottomJet << ")";
 
-   }
-
-   if (displayOutput) {
-      cout << "MC Hadronic bottom: " << "(" << MChadronicBottom_px << ", " << MChadronicBottom_py << ", " << MChadronicBottom_pz << ") (" << mcHadronicBottomJet->Phi() << ", " << mcHadronicBottomJet->Eta() << ")\n";
-      cout << "MC Leptonic bottom: " << "(" << MCleptonicBottom_px << ", " << MCleptonicBottom_py << ", " << MCleptonicBottom_pz << ") (" << mcLeptonicBottomJet->Phi() << ", " << mcLeptonicBottomJet->Eta() << ")\n";
-   }
-
-   if (eventHasHadronicBottom && eventHasLeptonicBottom) {
-
-      if (displayOutput) {
-         cout << "Event is semi-leptonic decay.\n";
-      }
-
-      SemiLeptonicDecayEvents++;
-
-      if (foundHadronicBottomJet->GetBTagDiscriminator() > 1.74 && foundLeptonicBottomJet->GetBTagDiscriminator() > 1.74) {
-         SemiLeptonicDecayEventsWithGoodEnoughBTag++;
-
-         if (displayOutput) {
-            cout << "Event has also good enough BTags.\n";
+         if (isFromHadronicBottomDecay) {
+            cout << " hadronic";
          }
 
+         if (isFromLeptonicBottomDecay) {
+            cout << " leptonic";
+         }
+
+         cout << "\n";
       }
 
+   }
+
+   if (hasConstructedMcHadronicBottomJet && constructedMcHadronicBottomJet->GetBTagDiscriminator() > 1.74) {
+      ConstructedMcHadronicWithGoodBtagCount++;
+   }
+
+   if (hasConstructedMcLeptonicBottomJet && constructedMcLeptonicBottomJet->GetBTagDiscriminator() > 1.74) {
+      ConstructedMcLeptonicWithGoodBtagCount++;
+   }
+
+   if (hasConstructedMcHadronicBottomJet && hasConstructedMcLeptonicBottomJet) {
+      ConstructedMcSemiLeptonicDecayEvents++;
+   }
+
+   if (hasConstructedMcHadronicBottomJet && hasConstructedMcLeptonicBottomJet && constructedMcLeptonicBottomJet->GetBTagDiscriminator() > 1.74 && constructedMcLeptonicBottomJet->GetBTagDiscriminator() > 1.74) {
+      ConstructedMcHadronicAndLeptonicWithGoodBtagCount++;
    }
 
    if (displayOutput) {
@@ -613,6 +661,11 @@ Bool_t MyAnalysis::ProcessEx4() {
    return kTRUE;
 }
 
+void MyAnalysis::logValueAndProcent(string key, int value, int total) {
+   double procent = ((double) value) / ((double) total) * 100;
+   cout << key << ": " << value << " (" << procent << ")\n";
+}
+
 void MyAnalysis::SlaveTerminate() {
    // The SlaveTerminate() function is called after all entries or objects
    // have been processed. When running with PROOF SlaveTerminate() is called
@@ -620,13 +673,18 @@ void MyAnalysis::SlaveTerminate() {
 
    // ex3 generate effiency
 
-   int semiLeptonicDecayEventsProcent = ((float)SemiLeptonicDecayEvents / (float)TotalEvents) * 100;
-   int semiLeptonicDecayEventsWithGoodEnoughBTagProcent = ((float)SemiLeptonicDecayEventsWithGoodEnoughBTag / (float)TotalEvents) * 100;
-
    cout << "EventWeight: " << EventWeight << "\n";
    cout << "TotalEvents: " << TotalEvents << "\n";
-   cout << "SemiLeptonicDecayEvents: " << SemiLeptonicDecayEvents << " (" << semiLeptonicDecayEventsProcent << "%) \n";
-   cout << "SemiLeptonicDecayEventsWithGoodEnoughBTag: " << semiLeptonicDecayEventsWithGoodEnoughBTagProcent << " ( " << SemiLeptonicDecayEventsWithGoodEnoughBTagProcent << "%) \n";
+
+   logValueAndProcent("RealMcHadronicCount", RealMcHadronicCount, TotalEvents);
+   logValueAndProcent("RealMcLeptonicCount", RealMcLeptonicCount, TotalEvents);
+   logValueAndProcent("RealMcSemiLeptonicDecayEvents", RealMcSemiLeptonicDecayEvents, TotalEvents);
+   logValueAndProcent("ConstructedMcHadronicCount", ConstructedMcHadronicCount, TotalEvents);
+   logValueAndProcent("ConstructedMcLeptonicCount", ConstructedMcLeptonicCount, TotalEvents);
+   logValueAndProcent("ConstructedMcSemiLeptonicDecayEvents", ConstructedMcSemiLeptonicDecayEvents, TotalEvents);
+   logValueAndProcent("ConstructedMcHadronicWithGoodBtagCount", ConstructedMcHadronicWithGoodBtagCount, TotalEvents);
+   logValueAndProcent("ConstructedMcLeptonicWithGoodBtagCount", ConstructedMcLeptonicWithGoodBtagCount, TotalEvents);
+   logValueAndProcent("ConstructedMcHadronicAndLeptonicWithGoodBtagCount", ConstructedMcHadronicAndLeptonicWithGoodBtagCount, TotalEvents);
 
    ex3MuonsOver25PtHltEffiency->Divide(ex3MuonsOver25PtPassedHlt, ex3MuonsOver25Pt);
    ex3AFterCutsAcceptance->Divide(ex3AFterCutsEvents, ex3TotalEvents);
