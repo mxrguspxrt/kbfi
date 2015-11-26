@@ -707,6 +707,10 @@ void MyAnalysis::SlaveTerminate() {
    cout << "EventWeight: " << EventWeight << "\n";
    cout << "TotalEvents: " << TotalEvents << "\n";
 
+
+   // should understand what data MC generated, what processes are happening, what is constructed
+   // should be compared to real data
+
    logValueAndProcent("RealMcHadronicCount", RealMcHadronicCount, TotalEvents);
    logValueAndProcent("RealMcLeptonicCount", RealMcLeptonicCount, TotalEvents);
    logValueAndProcent("RealMcSemiLeptonicDecayEvents", RealMcSemiLeptonicDecayEvents, TotalEvents);
