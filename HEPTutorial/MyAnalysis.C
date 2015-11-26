@@ -148,13 +148,13 @@ void MyAnalysis::SlaveBegin(TTree * /*tree*/) {
    ex3MuonsOver25PtHltEffiency = this->createHistogram("Efficiency", pins, xup, xlow);
    ex3MuonsOver25PtHltEffiency->SetXTitle("effiency for pT");
 
-   ex3TotalEvents = this->createHistogram("ex3TotalEvents", pins, xup, xlow);
+   ex3TotalEvents = this->createHistogram("ex3TotalEvents", 100, 0, 2);
    ex3TotalEvents->SetXTitle("ex3TotalEvents");
 
-   ex3AFterCutsEvents = this->createHistogram("ex3AFterCutsEvents", pins, xup, xlow);
+   ex3AFterCutsEvents = this->createHistogram("ex3AFterCutsEvents", 100, 0, 2);
    ex3AFterCutsEvents->SetXTitle("ex3AFterCutsEvents");
 
-   ex3AFterCutsAcceptance = this->createHistogram("ex3AFterCutsAcceptance", pins, xup, xlow);
+   ex3AFterCutsAcceptance = this->createHistogram("ex3AFterCutsAcceptance", 100, 0, 2);
    ex3AFterCutsAcceptance->SetXTitle("ex3AFterCutsAcceptance");
 
 }
