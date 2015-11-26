@@ -593,13 +593,13 @@ Bool_t MyAnalysis::Eyeball() {
                                    abs(jet->Px() - MChadronicBottom_px) < 20 &&
                                    abs(jet->Py() - MChadronicBottom_py) < 20 &&
                                    abs(jet->Pz() - MChadronicBottom_pz) < 20 &&
-                                   abs(deltaRFromRealMcHadronicBottomJet) < 0.1;
+                                   abs(deltaRFromRealMcHadronicBottomJet) < 0.3;
 
       bool isFromLeptonicBottomDecay = hasRealMcLeptonicBottomJet &&
                                    abs(jet->Px() - MCleptonicBottom_px) < 20 &&
                                    abs(jet->Py() - MCleptonicBottom_py) < 20 &&
                                    abs(jet->Pz() - MCleptonicBottom_pz) < 20 &&
-                                   abs(deltaRFromRealMcLeptonicBottomJet) < 0.1;;
+                                   abs(deltaRFromRealMcLeptonicBottomJet) < 0.3;;
 
       if (isFromHadronicBottomDecay) {
          constructedMcHadronicBottomJet = (MyJet*) jet;
@@ -648,6 +648,37 @@ Bool_t MyAnalysis::Eyeball() {
       ConstructedMcHadronicAndLeptonicWithGoodBtagCount++;
    }
 
+   if (
+         (hasConstructedMcHadronicBottomJet && constructedMcLeptonicBottomJet->GetBTagDiscriminator() > 1.74) ||
+         (hasConstructedMcLeptonicBottomJet && constructedMcLeptonicBottomJet->GetBTagDiscriminator() > 1.74)
+      ) {
+      ConstructedMcHadronicOrLeptonicWithGoodBtagCount++;
+   }
+
+   if (MCleptonPDGid==13) {
+      RealMcMuonsCount++;
+   }
+
+   if (MCleptonPDGid==11) {
+      RealMcElectronsCount++;
+   }
+
+   if (MCleptonPDGid==15) {
+      RealMcTausCount++;
+   }
+
+   if (MCleptonPDGid==-13) {
+      RealMcAntiTausCount++;
+   }
+
+   if (MCleptonPDGid==11) {
+      RealMcAntiMuonsCount++;
+   }
+
+   if (MCleptonPDGid==15) {
+      RealMcAntiElectronsCount++;
+   }
+
    if (displayOutput) {
       cout << "\n";
    }
@@ -679,12 +710,20 @@ void MyAnalysis::SlaveTerminate() {
    logValueAndProcent("RealMcHadronicCount", RealMcHadronicCount, TotalEvents);
    logValueAndProcent("RealMcLeptonicCount", RealMcLeptonicCount, TotalEvents);
    logValueAndProcent("RealMcSemiLeptonicDecayEvents", RealMcSemiLeptonicDecayEvents, TotalEvents);
+   logValueAndProcent("RealMcMuonsCount", RealMcMuonsCount, TotalEvents);
+   logValueAndProcent("RealMcElectronsCount", RealMcElectronsCount, TotalEvents);
+   logValueAndProcent("RealMcTausCount", RealMcTausCount, TotalEvents);
+   logValueAndProcent("RealMcAntiMuonsCount", RealMcMuonsCount, TotalEvents);
+   logValueAndProcent("RealMcAntiElectronsCount", RealMcElectronsCount, TotalEvents);
+   logValueAndProcent("RealMcAntiTausCount", RealMcTausCount, TotalEvents);
    logValueAndProcent("ConstructedMcHadronicCount", ConstructedMcHadronicCount, TotalEvents);
    logValueAndProcent("ConstructedMcLeptonicCount", ConstructedMcLeptonicCount, TotalEvents);
    logValueAndProcent("ConstructedMcSemiLeptonicDecayEvents", ConstructedMcSemiLeptonicDecayEvents, TotalEvents);
    logValueAndProcent("ConstructedMcHadronicWithGoodBtagCount", ConstructedMcHadronicWithGoodBtagCount, TotalEvents);
    logValueAndProcent("ConstructedMcLeptonicWithGoodBtagCount", ConstructedMcLeptonicWithGoodBtagCount, TotalEvents);
    logValueAndProcent("ConstructedMcHadronicAndLeptonicWithGoodBtagCount", ConstructedMcHadronicAndLeptonicWithGoodBtagCount, TotalEvents);
+   logValueAndProcent("ConstructedMcHadronicOrLeptonicWithGoodBtagCount", ConstructedMcHadronicOrLeptonicWithGoodBtagCount, TotalEvents);
+
 
    ex3MuonsOver25PtHltEffiency->Divide(ex3MuonsOver25PtPassedHlt, ex3MuonsOver25Pt);
    ex3AFterCutsAcceptance->Divide(ex3AFterCutsEvents, ex3TotalEvents);

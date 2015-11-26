@@ -194,12 +194,19 @@ public:
    int RealMcHadronicCount;
    int RealMcLeptonicCount;
    int RealMcSemiLeptonicDecayEvents;
+   int RealMcMuonsCount;
+   int RealMcElectronsCount;
+   int RealMcTausCount;
+   int RealMcAntiTausCount;
+   int RealMcAntiMuonsCount;
+   int RealMcAntiElectronsCount;
    int ConstructedMcHadronicCount;
    int ConstructedMcLeptonicCount;
    int ConstructedMcSemiLeptonicDecayEvents;
    int ConstructedMcHadronicWithGoodBtagCount;
    int ConstructedMcLeptonicWithGoodBtagCount;
    int ConstructedMcHadronicAndLeptonicWithGoodBtagCount;
+   int ConstructedMcHadronicOrLeptonicWithGoodBtagCount;
 
    vector<MyJet> Jets;
    vector<MyMuon> Muons;
@@ -335,12 +342,19 @@ void MyAnalysis::Init(TTree *tree)
    RealMcHadronicCount = 0;
    RealMcLeptonicCount = 0;
    RealMcSemiLeptonicDecayEvents = 0;
+   RealMcMuonsCount = 0;
+   RealMcElectronsCount = 0;
+   RealMcAntiTausCount = 0;
+   RealMcAntiMuonsCount = 0;
+   RealMcAntiElectronsCount = 0;
+   RealMcTausCount = 0;
    ConstructedMcHadronicCount = 0;
    ConstructedMcLeptonicCount = 0;
    ConstructedMcSemiLeptonicDecayEvents = 0;
    ConstructedMcHadronicWithGoodBtagCount = 0;
    ConstructedMcLeptonicWithGoodBtagCount = 0;
    ConstructedMcHadronicAndLeptonicWithGoodBtagCount = 0;
+   ConstructedMcHadronicOrLeptonicWithGoodBtagCount = 0;
 }
 
 Bool_t MyAnalysis::Notify()
