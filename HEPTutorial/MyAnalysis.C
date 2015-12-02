@@ -462,14 +462,22 @@ Bool_t MyAnalysis::ProcessEx3() {
 
    // cut for 1 b-tagged jets (there should be 2, but 1 is maybe not read)
 
-   int count2BTaggedJets = 0;
+   int countBTaggedJets = 0;
    for (vector<MyJet>::iterator jet = Jets.begin(); jet != Jets.end(); ++jet) {
       if (jet->IsBTagged()) {
-         count2BTaggedJets++;
+         countBTaggedJets++;
       }
    }
 
-   if (count2BTaggedJets < 1) {
+   if (countBTaggedJets < 1) {
+      return false;
+   }
+
+   if (NJet < 3) {
+      return false;
+   }
+
+   if (!triggerIsoMu24) {
       return false;
    }
 

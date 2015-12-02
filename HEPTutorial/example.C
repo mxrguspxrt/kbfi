@@ -82,7 +82,42 @@ int main() {
 	P.AddBg(H->histograms, "QCD");
 	P.AddBg(I->histograms, "single Top");
 
-	P.Plot(string("results.pdf"));
+	P.Plot("results.pdf");
+
+
+
+   vector<TH1F*> dataWithoutBackgrounds;
+
+   int histogramsSize = A->histograms.size();
+   // for each data histogram
+   for (int i = 0; i < histogramsSize; i++) {
+      cout << "fuck: " << i << " of " << histogramsSize << "\n";
+      TH1F* histogram = (TH1F*) A->histograms.at(i)->Clone();
+
+      histogram->Add(C->histograms.at(i), -1);
+      histogram->Add(D->histograms.at(i), -1);
+      histogram->Add(E->histograms.at(i), -1);
+      histogram->Add(F->histograms.at(i), -1);
+      histogram->Add(G->histograms.at(i), -1);
+      histogram->Add(H->histograms.at(i), -1);
+      histogram->Add(I->histograms.at(i), -1);
+
+      dataWithoutBackgrounds.push_back(histogram);
+   }
+
+   Plotter plotterWithoutBackgrounds;
+   plotterWithoutBackgrounds.SetData(dataWithoutBackgrounds, "Data");
+   plotterWithoutBackgrounds.AddBg(B->histograms, "TTbar");
+   plotterWithoutBackgrounds.AddBg(C->histograms, "Wjets");
+   plotterWithoutBackgrounds.AddBg(D->histograms, "DY");
+   plotterWithoutBackgrounds.AddBg(E->histograms, "WW");
+   plotterWithoutBackgrounds.AddBg(F->histograms, "WZ");
+   plotterWithoutBackgrounds.AddBg(G->histograms, "ZZ");
+   plotterWithoutBackgrounds.AddBg(H->histograms, "QCD");
+   plotterWithoutBackgrounds.AddBg(I->histograms, "single Top");
+
+   plotterWithoutBackgrounds.Plot("results-without-bg.pdf");
+
 
 	Plotter P_MC;
 	P_MC.AddBg(B->histograms_MC, "TTbar");
@@ -94,8 +129,7 @@ int main() {
 	P_MC.AddBg(H->histograms_MC, "QCD");
 	P_MC.AddBg(I->histograms_MC, "single Top");
 
-
-   P_MC.Plot(string("results_MC.pdf"));
+   P_MC.Plot("results_MC.pdf");
 
 
    // 3.3
@@ -104,9 +138,8 @@ int main() {
    // the number of back- ground events after selection.
    // Subtract the expected background from the observed (selected) data events.
 
-   TCanvas *ex3EffiencyCanvas = new TCanvas("Canvas", "Ex3: trigger effieciency", 200, 10, 700, 500);
-
-   ex3EffiencyCanvas->Print("ex3.pdf");
+   TCanvas *ex3Canvas = new TCanvas("Canvas", "Ex3: trigger effieciency", 200, 10, 700, 500);
+   ex3Canvas->Print("ex3.pdf");
 
 
 
