@@ -104,12 +104,14 @@ void MyAnalysis::SlaveBegin(TTree * /*tree*/) {
    h_NMuon = this->createHistogram("Number of muons", 7, 0, 7);
 
    // task 2
-   TCanvas *nJetsCanvas = new TCanvas("canvas");
+   numberOfMuonsBeforeCut = this->createHistogram("Number of muons before cut", 7, 0, 7);
+   numberOfMuonsAfterCut = this->createHistogram("Number of muons after cut", 7, 0, 7);
+
 
    h_NJets = this->createHistogram("Number of jets before cut", 12, 0, 12);
    h_NJetsAfterCut = this->createHistogram("Number of jets after cut", 12, 0, 12);
-   hasTwoOppositelyChargedLeptonsHistogram = this->createHistogram("Has two opposite charged leptons", 2, 0, 2);
-   hasTwoOppositelyChargedLeptonsHistogramAfterCut = this->createHistogram("Has two opposite charged leptons after cut", 2, 0, 2);
+   // hasTwoOppositelyChargedLeptonsHistogram = this->createHistogram("Has two opposite charged leptons", 2, 0, 2);
+   // hasTwoOppositelyChargedLeptonsHistogramAfterCut = this->createHistogram("Has two opposite charged leptons after cut", 2, 0, 2);
    h_NBtaggedJets = this->createHistogram("Number of btagged jets", 12, 0, 12);
    h_NBtaggedJetsAfterCut = this->createHistogram("Number of btagged after cut", 12, 0, 12);
 
@@ -118,24 +120,24 @@ void MyAnalysis::SlaveBegin(TTree * /*tree*/) {
    h_MET = this->createHistogram("sqrt(MET_px*MET_px + MET_py*MET_py)", 50, 0, 100);
    h_IsolationElectrons = this->createHistogram("Electrons isolation", 50, 0, 100);
    h_NElectrons = this->createHistogram("Electrons count", 10, 0, 10);
-   muonsEtaHistogram = this->createHistogram("Muons (eta)", 100, -4, 4);
-   muonsPhiHistogram = this->createHistogram("Muons (phi)", 100, -4, 4);
-   muonsPtHistogram = this->createHistogram("Muons (pt)", 100, 0, 200);
-   muonsChargeHistogram = this->createHistogram("Muons charge", 100, -2, 2);
-   electronsEtaHistogram = this->createHistogram("Electrons (eta)", 100, -4, 4);
-   electronsPhiHistogram = this->createHistogram("Electrons (phi)", 100, -4, 4);
-   electronsPtHistogram = this->createHistogram("Electrons (pt)", 100, 0, 200);
-   electronsChargeHistogram = this->createHistogram("Electrons charge", 100, -2, 2);
-   jetsEtaHistogram = this->createHistogram("Jets (eta)", 100, -4, 4);
-   jetsPhiHistogram = this->createHistogram("Jets (phi)", 100, -4, 4);
-   jetsPtHistogram = this->createHistogram("Jets (pt)", 100, 0, 200);
+   muonsEtaHistogram = this->createHistogram("Muons (eta)", 8, -4, 4);
+   muonsPhiHistogram = this->createHistogram("Muons (phi)", 8, -4, 4);
+   muonsPtHistogram = this->createHistogram("Muons (pt)", 20, 0, 200);
+   muonsChargeHistogram = this->createHistogram("Muons charge", 50, -2, 2);
+   electronsEtaHistogram = this->createHistogram("Electrons (eta)", 8, -4, 4);
+   electronsPhiHistogram = this->createHistogram("Electrons (phi)", 8, -4, 4);
+   electronsPtHistogram = this->createHistogram("Electrons (pt)", 50, 0, 200);
+   electronsChargeHistogram = this->createHistogram("Electrons charge", 4, -2, 2);
+   jetsEtaHistogram = this->createHistogram("Jets (eta)", 50, -4, 4);
+   jetsPhiHistogram = this->createHistogram("Jets (phi)", 50, -4, 4);
+   jetsPtHistogram = this->createHistogram("Jets (pt)", 20, 0, 200);
 
-   signalBackgroundHistogram = this->createHistogram("S/B", 100, 0, 100);
-   signalBackgroundAfterCutsHistogram = this->createHistogram("S/B after cuts", 100, 0, 100);
+   signalBackgroundHistogram = this->createHistogram("S/B", 2, 1, 2);
+   signalBackgroundAfterCutsHistogram = this->createHistogram("S/B after cuts", 2, 1, 2);
 
 
    // task 3
-   int pins = 100;
+   int pins = 50;
    int xup = 0;
    int xlow = 200;
 
@@ -260,19 +262,25 @@ Bool_t MyAnalysis::ProcessEx2() {
    signalBackgroundHistogram->Fill(1, EventWeight);
 
 
-   // n jets cut
+   // n muon cut
+   int nMuon = Muons.size();
+   numberOfMuonsBeforeCut->Fill(nMuon, EventWeight);
 
-   int N_Jets = 0;
-
-   for (vector<MyJet>::iterator it = Jets.begin(); it != Jets.end(); ++it) {
-      ++N_Jets;
+   if (nMuon != 1) {
+      // semileptonic
+      return true;
    }
 
+   numberOfMuonsAfterCut->Fill(nMuon, EventWeight);
+
+
+
+   // n jets cut
+
+   int nJets = Jets.size();
    h_NJets->Fill(N_Jets, EventWeight);
 
-
-
-   if (N_Jets < 2) {
+   if (nJets < 3) {
       return kTRUE;
    }
 
@@ -281,36 +289,36 @@ Bool_t MyAnalysis::ProcessEx2() {
 
    // has positive and negative and lepton cut
 
-   bool hasPositiveLepton = false;
-   bool hasNegativeLepton = false;
+   // bool hasPositiveLepton = false;
+   // bool hasNegativeLepton = false;
 
-   for (vector<MyMuon>::iterator it = Muons.begin(); it != Muons.end(); ++it) {
-      if (it->GetCharge() == 1) {
-         hasPositiveLepton = true;
-      } else {
-         hasNegativeLepton = true;
-      }
-   }
+   // for (vector<MyMuon>::iterator it = Muons.begin(); it != Muons.end(); ++it) {
+   //    if (it->GetCharge() == 1) {
+   //       hasPositiveLepton = true;
+   //    } else {
+   //       hasNegativeLepton = true;
+   //    }
+   // }
 
-   for (vector<MyElectron>::iterator it = Electrons.begin(); it != Electrons.end(); ++it) {
-      if (it->GetCharge() == 1) {
-         hasPositiveLepton = true;
-      } else {
-         hasNegativeLepton = true;
-      }
-   }
+   // for (vector<MyElectron>::iterator it = Electrons.begin(); it != Electrons.end(); ++it) {
+   //    if (it->GetCharge() == 1) {
+   //       hasPositiveLepton = true;
+   //    } else {
+   //       hasNegativeLepton = true;
+   //    }
+   // }
 
-   bool hasTwoOppositelyChargedLeptons = hasPositiveLepton && hasNegativeLepton;
+   // bool hasTwoOppositelyChargedLeptons = hasPositiveLepton && hasNegativeLepton;
 
-   hasTwoOppositelyChargedLeptonsHistogram->Fill((!hasTwoOppositelyChargedLeptons ? 0 : 1), EventWeight);
+   // hasTwoOppositelyChargedLeptonsHistogram->Fill((!hasTwoOppositelyChargedLeptons ? 0 : 1), EventWeight);
 
 
 
-   if (!hasTwoOppositelyChargedLeptons) {
-      return true;
-   }
+   // if (!hasTwoOppositelyChargedLeptons) {
+   //    return true;
+   // }
 
-   hasTwoOppositelyChargedLeptonsHistogramAfterCut->Fill((!hasTwoOppositelyChargedLeptons ? 0 : 1), EventWeight);
+   // hasTwoOppositelyChargedLeptonsHistogramAfterCut->Fill((!hasTwoOppositelyChargedLeptons ? 0 : 1), EventWeight);
 
 
    int N_BtaggedJets = 0;

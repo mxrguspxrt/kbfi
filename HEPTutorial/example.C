@@ -91,7 +91,6 @@ int main() {
    int histogramsSize = A->histograms.size();
    // for each data histogram
    for (int i = 0; i < histogramsSize; i++) {
-      cout << "fuck: " << i << " of " << histogramsSize << "\n";
       TH1F* histogram = (TH1F*) A->histograms.at(i)->Clone();
 
       histogram->Add(C->histograms.at(i), -1);
@@ -108,13 +107,6 @@ int main() {
    Plotter plotterWithoutBackgrounds;
    plotterWithoutBackgrounds.SetData(dataWithoutBackgrounds, "Data");
    plotterWithoutBackgrounds.AddBg(B->histograms, "TTbar");
-   plotterWithoutBackgrounds.AddBg(C->histograms, "Wjets");
-   plotterWithoutBackgrounds.AddBg(D->histograms, "DY");
-   plotterWithoutBackgrounds.AddBg(E->histograms, "WW");
-   plotterWithoutBackgrounds.AddBg(F->histograms, "WZ");
-   plotterWithoutBackgrounds.AddBg(G->histograms, "ZZ");
-   plotterWithoutBackgrounds.AddBg(H->histograms, "QCD");
-   plotterWithoutBackgrounds.AddBg(I->histograms, "single Top");
 
    plotterWithoutBackgrounds.Plot("results-without-bg.pdf");
 

@@ -222,6 +222,9 @@ public:
    TH1F *h_Mmumu;
    TH1F *h_NMuon;
 
+   TH1F *numberOfMuonsBeforeCut;
+   TH1F *numberOfMuonsAfterCut;
+
    TH1F *h_NJets;
    TH1F *h_NJetsAfterCut;
    TH1F *h_NBtaggedJets;
