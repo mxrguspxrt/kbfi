@@ -1,0 +1,48 @@
+HLT = high (software) level trigger
+trigger effiency = tt bari sündmuste arv enne cute ja läbinud HLT / kõik tt bari sündmused ((seal ei tohiks olla oma cutte, sest siis ei ole õige nimetada trigger eff))
+acceptance = (tt bari sündmuste arv peale cute / tt bari sündmuste arv enne cute ja läbinud HLT) -- erinevatel protsessidel erinev
+
+
+
+
+(tt bari sündmuste arv enne cute ja läbinud HLT / kõik tt bari sündmused) * (tt bari sündmuste arv peale cute / tt bari sündmuste arv enne cute ja läbinud HLT)
+
+
+(10 / 100) * (50 / 10)
+0.1 * 5 = 0.5
+
+50 / 100
+
+tt bari sündmuste arv peale cute / kõik tt bari sündmused
+
+
+
+
+trigger effiency * acceptance = tt bari sündmuste arv peale cute / kõik tt bari sündmused
+acceptance = 1 - minu cuttide effektiivsus
+acceptance * trigger effiency = ttbari sündmused peale cute / kõik sündmused?
+
+
+teada :
+* ttbari eventide hulk peale cute
+* trigger effiency (kõikidest eventidest need, mis on alles peale trig)
+* ?
+
+tahan :
+* kui palju kokku ttbari evente
+
+
+ristlõige - kui suure tõenäosusega sündmus toimub
+
+
+Kogusündmuste arv + luminosity on teada + ristlõike tarbeks (https://en.wikipedia.org/wiki/Cross_section_(physics))
+kogusündmustearv = ristlõige * luminosity
+ristlõige = kogusündmustearv / luminosity
+
+
+
+---
+
+trigger effiency = tt bari sündmuste arv enne cute ja läbinud HLT / kõik tt bari sündmused = 0.85 = 1001.8 / 7929.18
+acceptance = tt bari sündmuste arv peale cute / tt bari sündmuste arv enne cute ja läbinud HLT = 350 / 1000 = 0.35
+cross section = 340 / 50 pb-1 = 6.8

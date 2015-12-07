@@ -190,6 +190,11 @@ public:
    double getMuonHighestPt();
 
    int TotalEvents;
+   double TotalEventsWithEventWeight;
+   int TriggeredEvents;
+   double TriggeredEventsWithEventWeight;
+   double HasTriggerIsoMu24ButHasNoMuonsWithEventWeight;
+
 
    int RealMcHadronicCount;
    int RealMcLeptonicCount;
@@ -341,6 +346,10 @@ void MyAnalysis::Init(TTree *tree)
    fChain->SetBranchAddress("EventWeight", &EventWeight, &b_EventWeight);
 
    TotalEvents = 0;
+   TotalEventsWithEventWeight = 0.0;
+   TriggeredEvents = 0;
+   TriggeredEventsWithEventWeight = 0.0;
+   HasTriggerIsoMu24ButHasNoMuonsWithEventWeight = 0.0;
 
    RealMcHadronicCount = 0;
    RealMcLeptonicCount = 0;

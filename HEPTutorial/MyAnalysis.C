@@ -141,14 +141,14 @@ void MyAnalysis::SlaveBegin(TTree * /*tree*/) {
    int xup = 0;
    int xlow = 200;
 
-   ex3MuonsOver25Pt = this->createHistogram("Muon pt", pins, xup, xlow);
-   ex3MuonsOver25Pt->SetXTitle("muon pT");
+   ex3MuonsOver25Pt = this->createHistogram("ex3MuonsOver25Pt: Muon pt over 25GeV", 25, xup, 225);
+   ex3MuonsOver25Pt->SetXTitle("ex3MuonsOver25Pt: Muon pt over 25GeV");
 
-   ex3MuonsOver25PtPassedHlt = this->createHistogram("Passed HLT", pins, xup, xlow);
-   ex3MuonsOver25PtPassedHlt->SetXTitle("muon passed HLT pT");
+   ex3MuonsOver25PtPassedHlt = this->createHistogram("ex3MuonsOver25PtPassedHlt: Muon pt over 25GeV passed HLT", 25, xup, 225);
+   ex3MuonsOver25PtPassedHlt->SetXTitle("ex3MuonsOver25PtPassedHlt: Muon pt over 25GeV passed HLT");
 
-   ex3MuonsOver25PtHltEffiency = this->createHistogram("Efficiency", pins, xup, xlow);
-   ex3MuonsOver25PtHltEffiency->SetXTitle("effiency for pT");
+   ex3MuonsOver25PtHltEffiency = this->createHistogram("ex3MuonsOver25PtHltEffiency: Efficiency", 25, xup, 225);
+   ex3MuonsOver25PtHltEffiency->SetXTitle("ex3MuonsOver25PtHltEffiency: effiency for pT");
 
    ex3TotalEvents = this->createHistogram("ex3TotalEvents", 100, 0, 2);
    ex3TotalEvents->SetXTitle("ex3TotalEvents");
@@ -203,6 +203,7 @@ Bool_t MyAnalysis::Process(Long64_t entry) {
    // The return value is currently not used.
 
    ++TotalEvents;
+   TotalEventsWithEventWeight += EventWeight;
 
    GetEntry(entry);
 
@@ -278,13 +279,13 @@ Bool_t MyAnalysis::ProcessEx2() {
    // n jets cut
 
    int nJets = Jets.size();
-   h_NJets->Fill(N_Jets, EventWeight);
+   h_NJets->Fill(nJets, EventWeight);
 
    if (nJets < 3) {
       return kTRUE;
    }
 
-   h_NJetsAfterCut->Fill(N_Jets, EventWeight);
+   h_NJetsAfterCut->Fill(nJets, EventWeight);
 
 
    // has positive and negative and lepton cut
@@ -384,6 +385,15 @@ Bool_t MyAnalysis::ProcessEx2() {
 
 Bool_t MyAnalysis::ProcessEx3() {
 
+   if (triggerIsoMu24) {
+      TriggeredEvents++;
+      TriggeredEventsWithEventWeight += EventWeight;
+   }
+
+   if (triggerIsoMu24 && (NMuon < 1)) {
+      HasTriggerIsoMu24ButHasNoMuonsWithEventWeight += EventWeight;
+   }
+
 
    ex3TotalEvents->Fill(1, EventWeight);
 
@@ -418,6 +428,16 @@ Bool_t MyAnalysis::ProcessEx3() {
    // 3. As 3.2 contains "In addition, the acceptance includes all the selection cuts that have
    //    been found in Exercise 2. ", I expect that cuts do not apply to 3.1
 
+   if (NMuon < 1) {
+      return false;
+   }
+
+   MyMuon muon = Muons.at(0);
+   ex3MuonsOver25Pt->Fill(muon.Pt(), EventWeight);
+
+   if (triggerIsoMu24) {
+      ex3MuonsOver25PtPassedHlt->Fill(muon.Pt(), EventWeight);
+   }
 
    // it is semileptonic
 
@@ -428,17 +448,15 @@ Bool_t MyAnalysis::ProcessEx3() {
 
    // it is isolated and pt is creater than 25
 
-   MyMuon muon = Muons.at(0);
-
    if (muon.IsIsolated() != true || muon.Pt() < 25) {
       return false;
    }
 
-   ex3MuonsOver25Pt->Fill(muon.Pt(), EventWeight);
+   // ex3MuonsOver25Pt->Fill(muon.Pt(), EventWeight);
 
-   if (triggerIsoMu24) {
-      ex3MuonsOver25PtPassedHlt->Fill(muon.Pt(), EventWeight);
-   }
+   // if (triggerIsoMu24) {
+   //    ex3MuonsOver25PtPassedHlt->Fill(muon.Pt(), EventWeight);
+   // }
 
    // this will contain ex3MuonsOver25PtPassedHlt / ex3MuonsOver25Pt
 
@@ -722,6 +740,10 @@ void MyAnalysis::SlaveTerminate() {
 
    cout << "EventWeight: " << EventWeight << "\n";
    cout << "TotalEvents: " << TotalEvents << "\n";
+   cout << "TotalEventsWithEventWeight: " << TotalEventsWithEventWeight << "\n";
+   cout << "TriggeredEvents: " << TriggeredEvents << "\n";
+   cout << "TriggeredEventsWithEventWeight: " << TriggeredEventsWithEventWeight << "\n";
+   cout << "HasTriggerIsoMu24ButHasNoMuonsWithEventWeight: " << HasTriggerIsoMu24ButHasNoMuonsWithEventWeight << "\n";
 
 
    // should understand what data MC generated, what processes are happening, what is constructed
@@ -744,6 +766,9 @@ void MyAnalysis::SlaveTerminate() {
    logValueAndProcent("ConstructedMcHadronicAndLeptonicWithGoodBtagCount", ConstructedMcHadronicAndLeptonicWithGoodBtagCount, TotalEvents);
    logValueAndProcent("ConstructedMcHadronicOrLeptonicWithGoodBtagCount", ConstructedMcHadronicOrLeptonicWithGoodBtagCount, TotalEvents);
 
+   cout << "ex3TotalEvents integral: " << ex3TotalEvents->Integral() << "\n";
+   cout << "ex3MuonsOver25PtPassedHlt integral: " << ex3MuonsOver25PtPassedHlt->Integral() << "\n";
+   cout << "ex3MuonsOver25Pt integral: " << ex3MuonsOver25Pt->Integral() << "\n";
 
    ex3MuonsOver25PtHltEffiency->Divide(ex3MuonsOver25PtPassedHlt, ex3MuonsOver25Pt);
    ex3AFterCutsAcceptance->Divide(ex3AFterCutsEvents, ex3TotalEvents);
