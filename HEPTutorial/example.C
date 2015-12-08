@@ -110,6 +110,8 @@ int main() {
 
    plotterWithoutBackgrounds.Plot("results-without-bg.pdf");
 
+   cout << "TTBAR events in data (having cuts and subtracted backgrounds):" << dataWithoutBackgrounds.at(histogramsSize-2)->Integral() << "\n";
+
 
 	Plotter P_MC;
 	P_MC.AddBg(B->histograms_MC, "TTbar");

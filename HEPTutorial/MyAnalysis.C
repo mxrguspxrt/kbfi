@@ -385,11 +385,8 @@ Bool_t MyAnalysis::ProcessEx2() {
 
 Bool_t MyAnalysis::ProcessEx3() {
 
-   if (triggerIsoMu24) {
-      TriggeredEvents++;
-      TriggeredEventsWithEventWeight += EventWeight;
-   }
-
+   // somehow we have triggeredevents that have no muons
+   //
    if (triggerIsoMu24 && (NMuon < 1)) {
       HasTriggerIsoMu24ButHasNoMuonsWithEventWeight += EventWeight;
    }
@@ -428,8 +425,17 @@ Bool_t MyAnalysis::ProcessEx3() {
    // 3. As 3.2 contains "In addition, the acceptance includes all the selection cuts that have
    //    been found in Exercise 2. ", I expect that cuts do not apply to 3.1
 
+   if (!triggerIsoMu24) {
+      return false;
+   }
+
    if (NMuon < 1) {
       return false;
+   }
+
+   if (triggerIsoMu24) {
+      TriggeredEvents++;
+      TriggeredEventsWithEventWeight += EventWeight;
    }
 
    MyMuon muon = Muons.at(0);
@@ -769,6 +775,7 @@ void MyAnalysis::SlaveTerminate() {
    cout << "ex3TotalEvents integral: " << ex3TotalEvents->Integral() << "\n";
    cout << "ex3MuonsOver25PtPassedHlt integral: " << ex3MuonsOver25PtPassedHlt->Integral() << "\n";
    cout << "ex3MuonsOver25Pt integral: " << ex3MuonsOver25Pt->Integral() << "\n";
+   cout << "ex3AFterCutsEvents integral: " << ex3AFterCutsEvents->Integral() << "\n";
 
    ex3MuonsOver25PtHltEffiency->Divide(ex3MuonsOver25PtPassedHlt, ex3MuonsOver25Pt);
    ex3AFterCutsAcceptance->Divide(ex3AFterCutsEvents, ex3TotalEvents);
