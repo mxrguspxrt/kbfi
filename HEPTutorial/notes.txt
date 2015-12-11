@@ -48,11 +48,53 @@ acceptance = tt bari sündmuste arv peale cute / tt bari sündmuste arv enne cut
 cross section = ((331 / 0.12) / 0.35)) / 50 pb-1 = 7880.95 / 50 = 157.61
 
 
+
 ---
 
 Kinnitus:
 https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/CONFNOTES/ATLAS-CONF-2015-049/fig_06.png
-
+http://download.springer.com/static/pdf/255/art%253A10.1140%252Fepjc%252Fs10052-013-2328-7.pdf?originUrl=http%3A%2F%2Flink.springer.com%2Farticle%2F10.1140%2Fepjc%2Fs10052-013-2328-7&token2=exp=1449761459~acl=%2Fstatic%2Fpdf%2F255%2Fart%25253A10.1140%25252Fepjc%25252Fs10052-013-2328-7.pdf%3ForiginUrl%3Dhttp%253A%252F%252Flink.springer.com%252Farticle%252F10.1140%252Fepjc%252Fs10052-013-2328-7*~hmac=9ee3f900717e0aa6f17232b7137483714663d0fefb3cbb60d3e55ef322135188
+http://journals.aps.org/prd/abstract/10.1103/PhysRevD.90.072004
 
 ---
+
+TotalEvents: 36941
+TotalEventsWithEventWeight: 7929.18
+TriggeredEvents: 4163
+TriggeredEventsWithEventWeight: 933.366
+HasTriggerIsoMu24ButHasNoMuonsWithEventWeight: 68.4387
+RealMcHadronicCount: 16475 (44.5981)
+RealMcLeptonicCount: 16475 (44.5981)
+RealMcSemiLeptonicDecayEvents: 16475 (44.5981)
+RealMcMuonsCount: 2687 (7.27376)
+RealMcElectronsCount: 2801 (7.58236)
+RealMcTausCount: 2746 (7.43348)
+RealMcAntiMuonsCount: 2687 (7.27376)
+RealMcAntiElectronsCount: 2801 (7.58236)
+RealMcAntiTausCount: 2746 (7.43348)
+ConstructedMcHadronicCount: 8473 (22.9366)
+ConstructedMcLeptonicCount: 8285 (22.4277)
+ConstructedMcSemiLeptonicDecayEvents: 4281 (11.5887)
+ConstructedMcHadronicWithGoodBtagCount: 5481 (14.8372)
+ConstructedMcLeptonicWithGoodBtagCount: 5377 (14.5556)
+ConstructedMcHadronicAndLeptonicWithGoodBtagCount: 2786 (7.54176)
+ConstructedMcHadronicOrLeptonicWithGoodBtagCount: 7214 (19.5284)
+ex3TotalEvents integral: 7928.61
+ex3MuonsOver25PtPassedHlt integral: 930.903
+ex3MuonsOver25Pt integral: 930.903
+ex3AFterCutsEvents integral: 349.693
+h_NBtaggedJets: 594.011
+h_NBtaggedJetsAfterCut: 473.85
+
+
+
+luminosity uncertainty 10% - beam collision factors (x, y, z, bunch size, protons in bunch)
+
+b-tagging efficiency 10% - decay of bottom quark hadron happens away from collision,
+jets can be idenfied from path, but sensors are not exactly placed (differences), distance from the
+collision point has to be enough.
+
+trigger efficiency 5% - muon detector can have issues
+
+cross-section uncertainity on background events is 10% - uncertainity of background influencing data.
 

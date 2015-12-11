@@ -337,7 +337,7 @@ Bool_t MyAnalysis::ProcessEx2() {
       return true;
    }
 
-   h_NBtaggedJetsAfterCut->Fill(N_BtaggedJets);
+   h_NBtaggedJetsAfterCut->Fill(N_BtaggedJets, EventWeight);
 
    for (vector<MyMuon>::iterator it = Muons.begin(); it != Muons.end(); ++it) {
       muonsEtaHistogram->Fill(it->Eta(), EventWeight);
@@ -776,6 +776,8 @@ void MyAnalysis::SlaveTerminate() {
    cout << "ex3MuonsOver25PtPassedHlt integral: " << ex3MuonsOver25PtPassedHlt->Integral() << "\n";
    cout << "ex3MuonsOver25Pt integral: " << ex3MuonsOver25Pt->Integral() << "\n";
    cout << "ex3AFterCutsEvents integral: " << ex3AFterCutsEvents->Integral() << "\n";
+   cout << "h_NBtaggedJets: " << h_NBtaggedJets->Integral() << "\n";
+   cout << "h_NBtaggedJetsAfterCut: " << h_NBtaggedJetsAfterCut->Integral() << "\n";
 
    ex3MuonsOver25PtHltEffiency->Divide(ex3MuonsOver25PtPassedHlt, ex3MuonsOver25Pt);
    ex3AFterCutsAcceptance->Divide(ex3AFterCutsEvents, ex3TotalEvents);
