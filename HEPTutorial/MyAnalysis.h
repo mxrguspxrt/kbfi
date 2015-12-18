@@ -212,6 +212,15 @@ public:
    int ConstructedMcLeptonicWithGoodBtagCount;
    int ConstructedMcHadronicAndLeptonicWithGoodBtagCount;
    int ConstructedMcHadronicOrLeptonicWithGoodBtagCount;
+   float BeforeBTaggedJetsCutWeightedCount;
+   float AfterBTaggedJetsCutWeightedCount;
+   float Before3JetsCutWeightedCount;
+   float After3JetsCutWeightedCount;
+   float BeforeTriggerIsoMu24CutWeightedCount;
+   float AfterTriggerIsoMu24CutWeightedCount;
+   float BeforeMuonCutWeightedCount;
+   float AfterMuonCutWeightedCount;
+   float PassedEx4Cuts;
 
    vector<MyJet> Jets;
    vector<MyMuon> Muons;
@@ -269,6 +278,9 @@ public:
    TH1F *ex3TotalEvents;
    TH1F *ex3AFterCutsEvents;
    TH1F *ex3AFterCutsAcceptance;
+
+   TH1F *MassOfHadronicTopGeneratorHistogram;
+   TH1F *MassOfLeptonicTopGeneratorHistogram;
 
    vector<TH1F*> histograms;
    vector<TH1F*> histograms_MC;
@@ -367,6 +379,15 @@ void MyAnalysis::Init(TTree *tree)
    ConstructedMcLeptonicWithGoodBtagCount = 0;
    ConstructedMcHadronicAndLeptonicWithGoodBtagCount = 0;
    ConstructedMcHadronicOrLeptonicWithGoodBtagCount = 0;
+   BeforeBTaggedJetsCutWeightedCount = 0;
+   AfterBTaggedJetsCutWeightedCount = 0;
+   Before3JetsCutWeightedCount = 0;
+   After3JetsCutWeightedCount = 0;
+   BeforeTriggerIsoMu24CutWeightedCount = 0;
+   AfterTriggerIsoMu24CutWeightedCount = 0;
+   BeforeMuonCutWeightedCount = 0;
+   AfterMuonCutWeightedCount = 0;
+   PassedEx4Cuts = 0;
 }
 
 Bool_t MyAnalysis::Notify()

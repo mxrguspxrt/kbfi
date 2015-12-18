@@ -19,8 +19,9 @@ tt bari sündmuste arv peale cute / kõik tt bari sündmused
 
 
 trigger effiency * acceptance = tt bari sündmuste arv peale cute / kõik tt bari sündmused
-acceptance = 1 - minu cuttide effektiivsus
-acceptance * trigger effiency = ttbari sündmused peale cute / kõik sündmused?
+
+
+acceptance = fraction of events that pass pT and eta cuts on generator level (generator level = from MC simulation)
 
 
 teada :

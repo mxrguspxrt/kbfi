@@ -35,6 +35,7 @@
 #include "TGraphAsymmErrors.h"
 #include "TCanvas.h"
 #include <stdlib.h>
+#include "TLorentzVector.h"
 
 using namespace std;
 
@@ -159,6 +160,12 @@ void MyAnalysis::SlaveBegin(TTree * /*tree*/) {
    ex3AFterCutsAcceptance = this->createHistogram("ex3AFterCutsAcceptance", 100, 0, 2);
    ex3AFterCutsAcceptance->SetXTitle("ex3AFterCutsAcceptance");
 
+   MassOfHadronicTopGeneratorHistogram = this->createHistogram("MassOfHadronicTopGeneratorHistogram", 100, 0, 200);
+   MassOfHadronicTopGeneratorHistogram->SetXTitle("MassOfHadronicTopGeneratorHistogram");
+
+   MassOfLeptonicTopGeneratorHistogram = this->createHistogram("MassOfLeptonicTopGeneratorHistogram", 100, 0, 200);
+   MassOfLeptonicTopGeneratorHistogram->SetXTitle("MassOfLeptonicTopGeneratorHistogram");
+
 }
 
 
@@ -218,7 +225,8 @@ Bool_t MyAnalysis::Process(Long64_t entry) {
    ProcessEx1();
    ProcessEx2();
    ProcessEx3();
-   Eyeball();
+   ProcessEx4();
+   // Eyeball();
 
 
    return kTRUE;
@@ -425,31 +433,28 @@ Bool_t MyAnalysis::ProcessEx3() {
    // 3. As 3.2 contains "In addition, the acceptance includes all the selection cuts that have
    //    been found in Exercise 2. ", I expect that cuts do not apply to 3.1
 
+   BeforeTriggerIsoMu24CutWeightedCount += EventWeight;
    if (!triggerIsoMu24) {
       return false;
    }
+   AfterTriggerIsoMu24CutWeightedCount += EventWeight;
 
-   if (NMuon < 1) {
-      return false;
-   }
-
-   if (triggerIsoMu24) {
-      TriggeredEvents++;
-      TriggeredEventsWithEventWeight += EventWeight;
-   }
-
-   MyMuon muon = Muons.at(0);
-   ex3MuonsOver25Pt->Fill(muon.Pt(), EventWeight);
-
-   if (triggerIsoMu24) {
-      ex3MuonsOver25PtPassedHlt->Fill(muon.Pt(), EventWeight);
-   }
 
    // it is semileptonic
-
+   BeforeMuonCutWeightedCount += EventWeight;
    if (NMuon != 1) {
       return false;
    }
+   AfterMuonCutWeightedCount += EventWeight;
+
+
+   TriggeredEvents++;
+   TriggeredEventsWithEventWeight += EventWeight;
+
+
+   MyMuon muon = Muons.at(0);
+   ex3MuonsOver25Pt->Fill(muon.Pt(), EventWeight);
+   ex3MuonsOver25PtPassedHlt->Fill(muon.Pt(), EventWeight);
 
 
    // it is isolated and pt is creater than 25
@@ -457,18 +462,6 @@ Bool_t MyAnalysis::ProcessEx3() {
    if (muon.IsIsolated() != true || muon.Pt() < 25) {
       return false;
    }
-
-   // ex3MuonsOver25Pt->Fill(muon.Pt(), EventWeight);
-
-   // if (triggerIsoMu24) {
-   //    ex3MuonsOver25PtPassedHlt->Fill(muon.Pt(), EventWeight);
-   // }
-
-   // this will contain ex3MuonsOver25PtPassedHlt / ex3MuonsOver25Pt
-
-   ex3MuonsOver25PtHltEffiency;
-
-
 
 
    // 3.2
@@ -501,13 +494,17 @@ Bool_t MyAnalysis::ProcessEx3() {
       }
    }
 
+   BeforeBTaggedJetsCutWeightedCount += EventWeight;
    if (countBTaggedJets < 1) {
       return false;
    }
+   AfterBTaggedJetsCutWeightedCount += EventWeight;
 
+   Before3JetsCutWeightedCount += EventWeight;
    if (NJet < 3) {
       return false;
    }
+   After3JetsCutWeightedCount += EventWeight;
 
    if (!triggerIsoMu24) {
       return false;
@@ -519,7 +516,7 @@ Bool_t MyAnalysis::ProcessEx3() {
 
    // this will contain Number of selected events after cuts / Number of generated top quark events
 
-   ex3AFterCutsAcceptance;
+   //ex3AFterCutsAcceptance;
 
 
 
@@ -563,7 +560,91 @@ Bool_t MyAnalysis::ProcessEx3() {
    return true;
 }
 
+Bool_t MyAnalysis::ProcessEx4() {
+
+   if (!triggerIsoMu24) {
+      return false;
+   }
+
+   if (NMuon < 1) {
+      return false;
+   }
+
+   int jetsCount = Jets.size();
+   if (jetsCount != 4) {
+      return false;
+   }
+
+   int bJetsCount = 0;
+   for(int i = 0; i < jetsCount; i++) {
+      MyJet *jet = &Jets.at(i);
+      if (jet->IsBTagged()) {
+         bJetsCount++;
+      }
+   }
+
+   if (bJetsCount != 2) {
+      return false;
+   }
+
+   PassedEx4Cuts += EventWeight;
+
+   // What is the mass of the top quark in MC simulation (in tt events)?
+   // Use the generator-level truth information to calculate the top quark fourvector in the hadronic and leptonic branch.
+
+
+   // cout << "MChadronicBottom_px: " << MChadronicBottom_px << "\n";
+   // cout << "MChadronicBottom_py: " << MChadronicBottom_py << "\n";
+   // cout << "MChadronicBottom_pz: " << MChadronicBottom_pz << "\n";
+   // cout << "MChadronicWDecayQuark_px: " << MChadronicWDecayQuark_px << "\n";
+   // cout << "MChadronicWDecayQuark_py: " << MChadronicWDecayQuark_py << "\n";
+   // cout << "MChadronicWDecayQuark_pz: " << MChadronicWDecayQuark_pz << "\n";
+   // cout << "MChadronicWDecayQuarkBar_px: " << MChadronicWDecayQuarkBar_px << "\n";
+   // cout << "MChadronicWDecayQuarkBar_py: " << MChadronicWDecayQuarkBar_py << "\n";
+   // cout << "MChadronicWDecayQuarkBar_pz: " << MChadronicWDecayQuarkBar_pz << "\n";
+   // cout << "MCleptonicBottom_px: " << MCleptonicBottom_px << "\n";
+   // cout << "MCleptonicBottom_py: " << MCleptonicBottom_py << "\n";
+   // cout << "MCleptonicBottom_pz: " << MCleptonicBottom_pz << "\n";
+   // cout << "MClepton_px: " << MClepton_px << "\n";
+   // cout << "MClepton_py: " << MClepton_py << "\n";
+   // cout << "MClepton_pz: " << MClepton_pz << "\n";
+   // cout << "MCneutrino_px: " << MCneutrino_px << "\n";
+   // cout << "MCneutrino_py: " << MCneutrino_py << "\n";
+   // cout << "MCneutrino_pz: " << MCneutrino_pz << "\n";
+
+
+   MyJet *hadronicBottom = new MyJet();
+   hadronicBottom->SetXYZM(MChadronicBottom_px, MChadronicBottom_py, MChadronicBottom_pz, 0);
+
+   MyJet *hadronicQuark = new MyJet();
+   hadronicQuark->SetXYZM(MChadronicWDecayQuark_px, MChadronicWDecayQuark_py, MChadronicWDecayQuark_pz, 0);
+
+   MyJet *hadronicAntiQuark = new MyJet();
+   hadronicAntiQuark->SetXYZM(MChadronicWDecayQuarkBar_px, MChadronicWDecayQuarkBar_py, MChadronicWDecayQuarkBar_pz, 0);
+
+   double massOfHadronicTop = (*hadronicQuark + *hadronicAntiQuark + *hadronicBottom).M();
+
+   MassOfHadronicTopGeneratorHistogram->Fill(massOfHadronicTop, EventWeight);
+
+   MyJet *leptonicBottom = new MyJet();
+   leptonicBottom->SetXYZM(MCleptonicBottom_px, MCleptonicBottom_py, MCleptonicBottom_pz, 0);
+
+   TLorentzVector *leptonicLepton = new TLorentzVector();
+   leptonicBottom->SetXYZM(MClepton_px, MClepton_py, MClepton_pz, 0);
+
+   TLorentzVector *leptonicNeutrino = new TLorentzVector();
+   leptonicNeutrino->SetXYZM(MCneutrino_px, MCneutrino_py, MCneutrino_pz, 0);
+
+   double massOfLeptonicTop = (*leptonicBottom + *leptonicLepton + *leptonicNeutrino).M();
+
+   MassOfLeptonicTopGeneratorHistogram->Fill(massOfLeptonicTop, EventWeight);
+
+   return true;
+}
+
 Bool_t MyAnalysis::Eyeball() {
+
+
 
    // we are eyeballing only first 20 events
 
@@ -576,6 +657,7 @@ Bool_t MyAnalysis::Eyeball() {
    MyJet *realMcLeptonicBottomJet;
    bool hasRealMcHadronicBottomJet;
    bool hasRealMcLeptonicBottomJet;
+
 
    if (MChadronicBottom_px != 0) {
       realMcHadronicBottomJet = new MyJet();
@@ -600,6 +682,8 @@ Bool_t MyAnalysis::Eyeball() {
 
       RealMcLeptonicCount++;
    }
+
+
 
    if (hasRealMcHadronicBottomJet && hasRealMcLeptonicBottomJet) {
       RealMcSemiLeptonicDecayEvents++;
@@ -728,9 +812,6 @@ Bool_t MyAnalysis::Eyeball() {
    return true;
 }
 
-Bool_t MyAnalysis::ProcessEx4() {
-   return kTRUE;
-}
 
 void MyAnalysis::logValueAndProcent(string key, int value, int total) {
    double procent = ((double) value) / ((double) total) * 100;
@@ -778,6 +859,19 @@ void MyAnalysis::SlaveTerminate() {
    cout << "ex3AFterCutsEvents integral: " << ex3AFterCutsEvents->Integral() << "\n";
    cout << "h_NBtaggedJets: " << h_NBtaggedJets->Integral() << "\n";
    cout << "h_NBtaggedJetsAfterCut: " << h_NBtaggedJetsAfterCut->Integral() << "\n";
+
+
+   cout << "BeforeTriggerIsoMu24CutWeightedCount: " << BeforeTriggerIsoMu24CutWeightedCount << "\n";
+   cout << "AfterTriggerIsoMu24CutWeightedCount: " << AfterTriggerIsoMu24CutWeightedCount << "\n";
+   cout << "BeforeMuonCutWeightedCount: " << BeforeMuonCutWeightedCount << "\n";
+   cout << "AfterMuonCutWeightedCount: " << AfterMuonCutWeightedCount << "\n";
+   cout << "BeforeBTaggedJetsCutWeightedCount: " << BeforeBTaggedJetsCutWeightedCount << "\n";
+   cout << "AfterBTaggedJetsCutWeightedCount: " << AfterBTaggedJetsCutWeightedCount << "\n";
+   cout << "Before3JetsCutWeightedCount: " << Before3JetsCutWeightedCount << "\n";
+   cout << "After3JetsCutWeightedCount: " << After3JetsCutWeightedCount << "\n";
+
+   cout << "PassedEx4Cuts: " << PassedEx4Cuts << "\n";
+
 
    ex3MuonsOver25PtHltEffiency->Divide(ex3MuonsOver25PtPassedHlt, ex3MuonsOver25Pt);
    ex3AFterCutsAcceptance->Divide(ex3AFterCutsEvents, ex3TotalEvents);
