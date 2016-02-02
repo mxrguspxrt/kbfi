@@ -3,5 +3,3 @@ make
 ./example.x
 # open results.pdf
 # open results_MC.pdf
-open results-without-bg.pdf
-

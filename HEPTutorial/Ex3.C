@@ -7,6 +7,7 @@
 
 using namespace std;
 
+
 void Ex3::GenerateGraph() {
   cout << "Ex3 start.\n";
 

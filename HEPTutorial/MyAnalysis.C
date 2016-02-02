@@ -36,6 +36,7 @@
 #include "TCanvas.h"
 #include <stdlib.h>
 #include "TLorentzVector.h"
+#include <math.h>
 
 using namespace std;
 
@@ -143,29 +144,13 @@ void MyAnalysis::SlaveBegin(TTree * /*tree*/) {
    int xlow = 200;
 
    ex3MuonsOver25Pt = this->createHistogram("ex3MuonsOver25Pt: Muon pt over 25GeV", 25, xup, 225);
-   ex3MuonsOver25Pt->SetXTitle("ex3MuonsOver25Pt: Muon pt over 25GeV");
-
    ex3MuonsOver25PtPassedHlt = this->createHistogram("ex3MuonsOver25PtPassedHlt: Muon pt over 25GeV passed HLT", 25, xup, 225);
-   ex3MuonsOver25PtPassedHlt->SetXTitle("ex3MuonsOver25PtPassedHlt: Muon pt over 25GeV passed HLT");
-
-   ex3MuonsOver25PtHltEffiency = this->createHistogram("ex3MuonsOver25PtHltEffiency: Efficiency", 25, xup, 225);
-   ex3MuonsOver25PtHltEffiency->SetXTitle("ex3MuonsOver25PtHltEffiency: effiency for pT");
-
+   ex3MuonsOver25PtHltEffiency = this->createHistogram("ex3MuonsOver25PtHltEffiency: Efficiency for pt", 25, xup, 225);
    ex3TotalEvents = this->createHistogram("ex3TotalEvents", 100, 0, 2);
-   ex3TotalEvents->SetXTitle("ex3TotalEvents");
-
    ex3AFterCutsEvents = this->createHistogram("ex3AFterCutsEvents", 100, 0, 2);
-   ex3AFterCutsEvents->SetXTitle("ex3AFterCutsEvents");
-
    ex3AFterCutsAcceptance = this->createHistogram("ex3AFterCutsAcceptance", 100, 0, 2);
-   ex3AFterCutsAcceptance->SetXTitle("ex3AFterCutsAcceptance");
-
    MassOfHadronicTopGeneratorHistogram = this->createHistogram("MassOfHadronicTopGeneratorHistogram", 100, 0, 200);
-   MassOfHadronicTopGeneratorHistogram->SetXTitle("MassOfHadronicTopGeneratorHistogram");
-
    MassOfLeptonicTopGeneratorHistogram = this->createHistogram("MassOfLeptonicTopGeneratorHistogram", 100, 0, 200);
-   MassOfLeptonicTopGeneratorHistogram->SetXTitle("MassOfLeptonicTopGeneratorHistogram");
-
 }
 
 
@@ -622,22 +607,27 @@ Bool_t MyAnalysis::ProcessEx4() {
    MyJet *hadronicAntiQuark = new MyJet();
    hadronicAntiQuark->SetXYZM(MChadronicWDecayQuarkBar_px, MChadronicWDecayQuarkBar_py, MChadronicWDecayQuarkBar_pz, 0);
 
-   double massOfHadronicTop = (*hadronicQuark + *hadronicAntiQuark + *hadronicBottom).M();
+   TLorentzVector hadronicTop = (*hadronicQuark + *hadronicAntiQuark + *hadronicBottom);
+   MassOfHadronicTopGeneratorHistogram->Fill(hadronicTop.M(), EventWeight);
 
-   MassOfHadronicTopGeneratorHistogram->Fill(massOfHadronicTop, EventWeight);
 
    MyJet *leptonicBottom = new MyJet();
    leptonicBottom->SetXYZM(MCleptonicBottom_px, MCleptonicBottom_py, MCleptonicBottom_pz, 0);
 
-   TLorentzVector *leptonicLepton = new TLorentzVector();
+   TLorentzVector *leptonicLepton = new MyJet();
    leptonicBottom->SetXYZM(MClepton_px, MClepton_py, MClepton_pz, 0);
 
-   TLorentzVector *leptonicNeutrino = new TLorentzVector();
+   TLorentzVector *leptonicNeutrino = new MyJet();
    leptonicNeutrino->SetXYZM(MCneutrino_px, MCneutrino_py, MCneutrino_pz, 0);
 
-   double massOfLeptonicTop = (*leptonicBottom + *leptonicLepton + *leptonicNeutrino).M();
+   cout << "leptonicBottom px, py, pz: " << MCleptonicBottom_px << ", " << MCleptonicBottom_py << ", " << MCleptonicBottom_pz <<  "\n";
+   cout << "MClepton px, py, pz: " << MClepton_px << ", " << MClepton_py << ", " << MClepton_pz <<  "\n";
+   cout << "MCneutrino px, py, pz: " << MCneutrino_px << ", " << MCneutrino_py << ", " << MCneutrino_pz <<  "\n";
 
-   MassOfLeptonicTopGeneratorHistogram->Fill(massOfLeptonicTop, EventWeight);
+   TLorentzVector leptonicTop = (*leptonicBottom + *leptonicLepton + *leptonicNeutrino);
+   cout << "leptonictop M: " << leptonicTop.M() << "\n";
+
+   MassOfLeptonicTopGeneratorHistogram->Fill(leptonicTop.M(), EventWeight);
 
    return true;
 }
@@ -725,17 +715,18 @@ Bool_t MyAnalysis::Eyeball() {
                                    abs(jet->Pz() - MCleptonicBottom_pz) < 20 &&
                                    abs(deltaRFromRealMcLeptonicBottomJet) < 0.3;;
 
-      if (isFromHadronicBottomDecay) {
-         constructedMcHadronicBottomJet = (MyJet*) jet;
-         hasConstructedMcHadronicBottomJet = true;
-         ConstructedMcHadronicCount++;
-      }
+      // TODO some memory error
+      // if (isFromHadronicBottomDecay) {
+      //    constructedMcHadronicBottomJet = (MyJet*) jet;
+      //    hasConstructedMcHadronicBottomJet = true;
+      //    ConstructedMcHadronicCount++;
+      // }
 
-      if (isFromLeptonicBottomDecay) {
-         constructedMcLeptonicBottomJet = (MyJet*) jet;
-         hasConstructedMcLeptonicBottomJet = true;
-         ConstructedMcLeptonicCount++;
-      }
+      // if (isFromLeptonicBottomDecay) {
+      //    constructedMcLeptonicBottomJet = (MyJet*) jet;
+      //    hasConstructedMcLeptonicBottomJet = true;
+      //    ConstructedMcLeptonicCount++;
+      // }
 
 
       if (displayOutput) {

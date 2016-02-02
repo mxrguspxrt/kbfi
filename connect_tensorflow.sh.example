@@ -1,0 +1,2 @@
+ssh -f user@server1 -L 10022:server2:22 -N
+ssh -l root -p 10022 localhost
